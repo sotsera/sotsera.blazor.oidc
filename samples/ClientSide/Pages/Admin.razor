@@ -1,0 +1,6 @@
+﻿@page "/admin"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "admin, superuser")]
+
+<h1>Administration</h1>
+
+<p>This page is visible only to authenticated users with the "admin" role</p>

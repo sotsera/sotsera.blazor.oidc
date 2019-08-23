@@ -1,0 +1,44 @@
+﻿@inject Sotsera.Blazor.Oidc.IUserManager UserManager
+<AuthorizeView>
+    <Authorized>
+        @*<a href="/about">Hello, @context.User.Identity.Name!</a>*@
+        Hello, @context.User.Identity.Name!
+        <button type="button" class="btn btn-primary btn-sm ml-2 mr-1" @onclick="LogoutRedirect">
+            Log out (redirect)
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" @onclick="LogoutPopup">
+            Log out (popup)
+        </button>
+    </Authorized>
+    <NotAuthorized>
+        <button type="button" class="btn btn-primary btn-sm mr-1" @onclick="LoginRedirect">
+            Log in (redirect)
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" @onclick="LoginPopup">
+            Log in (popup)
+        </button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code
+{
+    public async void LoginRedirect()
+    {
+        await UserManager.BeginAuthenticationAsync(p => p.WithRedirect());
+    }
+
+    public async void LoginPopup()
+    {
+        await UserManager.BeginAuthenticationAsync();
+    }
+
+    public async void LogoutRedirect()
+    {
+        await UserManager.BeginLogoutAsync(p => p.WithRedirect());
+    }
+
+    public async void LogoutPopup()
+    {
+        await UserManager.BeginLogoutAsync();
+    }
+}

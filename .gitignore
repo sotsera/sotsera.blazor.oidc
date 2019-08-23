@@ -1,0 +1,9 @@
+.vs/
+bin/
+obj/
+node_modules/
+gh-pages/
+publish/
+
+*.user
+sotsera.blazor.oidc-1.0.0-alpha-1.js*

@@ -1,0 +1,18 @@
+﻿<!--
+Copyright (c) Alessandro Ghidini. All rights reserved.
+Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Sotsera.Blazor.Oidc Silent Renew Callback</title>
+</head>
+<body>
+    Sotsera.Blazor.Oidc Silent Renew Callback
+    <script>
+        Promise.resolve()
+            .then(() => window.opener.sotsera.blazor.oidc.silentRenewCallback());
+    </script>
+</body>
+</html>

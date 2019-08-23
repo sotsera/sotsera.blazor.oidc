@@ -1,0 +1,34 @@
+{
+  "name": "sotsera.blazor.oidc",
+  "version": "0.1.0",
+  "description": "open-id connect client for blazor client-side projects",
+  "author": "alessandro ghidini",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "keywords": [
+    "blazor",
+    "open-id",
+    "oidc"
+  ],
+  "scripts": {
+    "build:debug": "webpack --mode development",
+    "build:production": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/sotsera/sotsera.blazor.oidc#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotsera/sotsera.blazor.oidc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sotsera/sotsera.blazor.oidc/issues"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "xml2js": "^0.4.19"
+  }
+}
