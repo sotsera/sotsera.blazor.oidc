@@ -1,0 +1,81 @@
+﻿@inject Sotsera.Blazor.Oidc.OidcHttpClient HttpClient
+@inject Sotsera.Blazor.Oidc.IUserManager UserManager
+@inject Sotsera.Blazor.Toaster.IToaster Toaster
+
+<div class="row">
+    <div class="col">
+        <button @onclick="CallApi" class="btn btn-sm btn-primary mr-2">Call Api</button>
+        <button @onclick="Clear" class="btn btn-sm btn-dark">Clear</button>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col small">
+        Token expires at: <span class="font-weight-bold">@ExpirationDateTime</span> (with 5 mins clock skew allowed by the identity server)
+    </div>
+</div>
+@if (Claims != null)
+{
+    <table class="table table-sm mt-3 small">
+        <thead class="thead-dark">
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Claims.OrderBy(c => c.Type))
+            {
+                <tr>
+                    <td>@claim.Type</td>
+                    <td>@claim.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    ClaimsFromApi[] Claims { get; set; }
+
+    string ExpirationDateTime => UserManager.UserState.ExpiresAt.Value.ToString("R");
+
+    async Task CallApi()
+    {
+        Clear();
+        try
+        {
+            Claims = await HttpClient.GetJsonAsync<ClaimsFromApi[]>("https://demo.identityserver.io/api/test");
+            FormatDateClaim("nbf");
+            FormatDateClaim("exp");
+            FormatDateClaim("auth_time");
+        }
+        catch (HttpRequestException ex)
+        {
+            Toaster.Error(ex.Message);
+        }
+        StateHasChanged();
+    }
+
+    void FormatDateClaim(string key)
+    {
+        var claim = Claims?.FirstOrDefault(x => x.Type == key);
+        if (claim == null) return;
+
+        if (long.TryParse(claim.Value, out var epoch))
+        {
+            claim.Value = DateTimeOffset.FromUnixTimeSeconds(epoch).UtcDateTime.ToString("R");
+        }
+    }
+
+    void Clear()
+    {
+        Claims = null;
+        StateHasChanged();
+    }
+
+    public class ClaimsFromApi
+    {
+        public string Type { get; set; }
+        public string Value { get; set; }
+    }
+}

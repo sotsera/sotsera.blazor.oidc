@@ -26,14 +26,14 @@ namespace Sotsera.Blazor.Oidc.Core
         private ILogoutClient LogoutClient { get; }
         private IStore Store { get; }
         private Interop Interop { get; }
-        private OidcHttpClient HttpClient { get; set; }
+        private OidcHttpClient HttpClient { get; }
         private IUriHelper UriHelper { get; }
-        internal UserState UserState { get; private set; }
+
+        public OidcUser User => UserState?.User;
+        public UserState UserState { get; private set; }
         public string Version { get; }
         public event Action<OidcUser> UserChanged;
         public event Action<string> OnError;
-
-        public OidcUser User => UserState?.User;
 
         public UserManager(
             IOidcClient oidcClient, ILogoutClient logoutClient, IStore store, 
@@ -180,7 +180,7 @@ namespace Sotsera.Blazor.Oidc.Core
         {
             var projectName = typeof(IUserManager).Namespace;
             var fileVersion = $"_content/{projectName}/{projectName.ToLower()}-{Version}.js";
-            var errorMessage = $"Check if the index.html file references the correct js version:";
+            var errorMessage = "Check if the index.html file references the correct js version:";
             var line = new string('-', Math.Max(errorMessage.Length, fileVersion.Length));
 
             Logger.LogError(line);

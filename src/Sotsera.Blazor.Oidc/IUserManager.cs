@@ -11,6 +11,7 @@ namespace Sotsera.Blazor.Oidc
 {
     public interface IUserManager
     {
+        UserState UserState { get; }
         OidcUser User { get; }
         string Version { get; }
 

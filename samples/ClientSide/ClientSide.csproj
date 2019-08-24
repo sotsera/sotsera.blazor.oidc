@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="$(AspNetCoreVersion)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="$(AspNetCoreVersion)" PrivateAssets="all" />
+    <PackageReference Include="Sotsera.Blazor.Toaster" Version="1.0.0-preview.8.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,7 @@ using System;
 
 namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
 {
-    internal class UserState
+    public class UserState
     {
         public string AccessToken { get; set; }
         public DateTime? ExpiresAt { get; set; }
