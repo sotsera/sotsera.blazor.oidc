@@ -13,10 +13,10 @@ namespace ClientSide
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            var issuerUri = new Uri("https://demo.identityserver.io");
             var baseUri = new Uri(WebAssemblyUriHelper.Instance.GetBaseUri());
-            var identityserver = new Uri("https://demo.identityserver.io");
 
-            services.AddOidc(OidcSample.CodeWithShortLivedToken(new OidcSettings(identityserver, baseUri)
+            services.AddOidc(OidcSample.CodeWithShortLivedToken(new OidcSettings(issuerUri, baseUri)
             {
                 Scope = "openid profile email api",
                 MinimumLogeLevel = LogLevel.Warning,

@@ -2,7 +2,7 @@
 
 <AuthorizeView>
     <Authorizing>
-        Authorizing...
+        <h1>Authentication in progress</h1>
     </Authorizing>
     <Authorized>
         <ul class="nav nav-tabs mb-3" role="tablist">
@@ -20,19 +20,26 @@
             }
             else
             {
-                <div class="tab-pane fade show active" role="tabpanel"><Api/></div>
+                <div class="tab-pane fade show active" role="tabpanel"><Api /></div>
             }
         </div>
     </Authorized>
     <NotAuthorized>
-        LoggedOut
+        <h3>You're not currently authenticated</h3>
+        You can login to the
+        <a href="https://demo.identityserver.io/" target="_blank">Identity Server</a> demo instance
+        using your google account or one of the following <span class="font-weight-bold">test</span> users:
+        <ul>
+            <li>alice/alice</li>
+            <li>bob/bob</li>
+        </ul>
     </NotAuthorized>
 </AuthorizeView>
 
 @code
 {
     bool _showClaims = true;
-    
+
     void ShowClaims() => _showClaims = true;
     void ShowApi() => _showClaims = false;
 }

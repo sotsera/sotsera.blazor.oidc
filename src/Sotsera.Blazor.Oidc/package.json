@@ -1,7 +1,7 @@
 {
   "name": "sotsera.blazor.oidc",
   "version": "0.1.0",
-  "description": "open-id connect client for blazor client-side projects",
+  "description": "open-id connect client for blazor client-side or hosted projects",
   "author": "alessandro ghidini",
   "license": "Apache-2.0",
   "main": "index.js",

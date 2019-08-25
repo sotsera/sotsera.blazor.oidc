@@ -11,7 +11,7 @@
     <Version>1.0.0-alpha-1</Version>
     <Authors>Alessandro Ghidini</Authors>
     <Company></Company>
-    <Description>OpenID Connect (OIDC) code flow client for Blazor client-side or hosted projects</Description>
+    <Description>OpenID Connect (OIDC) client for Blazor client-side or hosted projects</Description>
     <Copyright>Alessandro Ghidini</Copyright>
     <PackageProjectUrl>https://github.com/sotsera/sotsera.blazor.oidc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/sotsera/sotsera.blazor.oidc.git</RepositoryUrl>
@@ -49,8 +49,9 @@
   </Target>
 
   <Target Name="RunWebpack" Inputs="@(WebpackInputs)" Outputs="wwwroot\sotsera.blazor.oidc-$(Version).js" DependsOnTargets="EnsureNpmRestored">
-    <Exec Command="npm run build:debug" Condition="'$(Configuration)' == 'Debug'" />
-    <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />
+    <!--<Exec Command="npm run build:debug" Condition="'$(Configuration)' == 'Debug'" />
+    <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />-->
+    <Exec Command="npm run build:production" />
   </Target>
 
 </Project>
