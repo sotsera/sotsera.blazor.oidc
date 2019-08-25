@@ -13,6 +13,8 @@ This is just a learning exercise built with three constraints:
 
 These constraints basically mean that everything must be written from scratch (JWT validation included).
 
+A demo project has been published [here](https://blazor-oidc.sotsera.com/).
+
 ## Installation
 
 Add a reference to the library from [![NuGet Pre Release](https://img.shields.io/nuget/vpre/Sotsera.Blazor.Oidc.svg)](https://www.nuget.org/packages/Sotsera.Blazor.Oidc/)
@@ -49,7 +51,7 @@ public void ConfigureServices(IServiceCollection services)
 Add the following reference to the oidc javascript in the __index.html__ file paying attention to match the library version:
 
 ```c#
-<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-1a1.js"></script>
+<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-1.js"></script>
 ```
 
 ### Blazor Authorization 
