@@ -26,11 +26,11 @@ namespace Sotsera.Blazor.Oidc
         }
 
         [DebuggerStepThrough]
-        public static string[] Split(this string value, char separator)
+        public static string[] SplitBy(this string value, params char[] separators)
         {
             return value.IsEmpty()
                 ? new string[0]
-                : value.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+                : value.Split(separators , StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

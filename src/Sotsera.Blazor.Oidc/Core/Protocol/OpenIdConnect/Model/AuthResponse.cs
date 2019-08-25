@@ -22,7 +22,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
         public bool Expired => ExpiresAt <= DateTime.Now;
         public IDictionary<string, object> Profile { get; set; }
 
-        public string[] Scopes => Scope.Split(new []{' '}, StringSplitOptions.RemoveEmptyEntries);
+        public string[] Scopes => Scope.SplitBy(' ');
         public bool ContainsToken => IdToken.IsNotEmpty() || Scope.Contains("openid");
 
         public bool LoadUserInfo { get; set; }
