@@ -6,4 +6,4 @@ gh-pages/
 publish/
 
 *.user
-sotsera.blazor.oidc-1.0.0-alpha-1.js*
+sotsera.blazor.oidc-1.0.0-alpha-*.js*

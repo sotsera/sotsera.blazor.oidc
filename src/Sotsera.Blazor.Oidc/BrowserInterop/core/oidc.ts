@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
+import { Frame, IPostToSessionFrame } from "./frame";
 import { Popup, IOpenPopupRequest } from "./popup";
 import timeout from "../utils/timeout";
 
@@ -11,12 +12,20 @@ export interface IDotNetReference {
 }
 
 export default class Oidc {
+    private sessionFrame: Frame | undefined;
     private popup: Popup | undefined;
     private interop: IDotNetReference | undefined;
 
     init = (interop: IDotNetReference): Promise<void> => {
         this.interop = interop;
         return Promise.resolve();
+    }
+
+    postToSessionFrame(request: IPostToSessionFrame): Promise<string> {
+        return timeout(request.timeout,
+            this.initCheckSession(request)
+                .then((frame) => frame.postToFrame(request.message))
+        );
     }
 
     openPopup = (request: IOpenPopupRequest): Promise<void> => {
@@ -36,6 +45,12 @@ export default class Oidc {
         return new Promise<void>((resolve, reject) => {
             reject("Not implemented yet");
         });
+    }
+
+    private async initCheckSession(request: IPostToSessionFrame): Promise<Frame> {
+        return this.sessionFrame !== undefined
+            ? Promise.resolve(this.sessionFrame)
+            : this.sessionFrame = await new Frame(request).load();
     }
 
     private popupCallback = async (callbackName: string): Promise<void> => {

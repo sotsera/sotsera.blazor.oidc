@@ -46,6 +46,7 @@ namespace Sotsera.Blazor.Oidc
         // Timeouts
         public TimeSpan HttpClientTimeout { get; set; } = TimeSpan.FromSeconds(5);
         public TimeSpan OpenPopupTimeout { get; set; } = TimeSpan.FromSeconds(5);
+        public TimeSpan CheckSessionTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
         // Storage
         public string StoragePrefix { get; set; } = "oidc";
@@ -59,6 +60,11 @@ namespace Sotsera.Blazor.Oidc
         public int MaxTokenSize { get; set; } = 1024 * 1024 * 2; // 2 Mb
         public TimeSpan ClockSkew { get; set; } = TimeSpan.FromMinutes(5);
         public bool RevokeAccessTokenOnSignout { get; set; } = false;
+
+        // Session Monitor
+        
+        public int CheckSessionInterval { get; set; } = 2000;
+        public bool CheckSessionStopOnError { get; set; } = true;
         
         // Logging
         public LogLevel MinimumLogeLevel { get; set; } = LogLevel.Warning;

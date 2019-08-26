@@ -46,6 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<IAuthRequestBuilder, AuthRequestBuilder>();
             services.TryAddTransient<IAuthResponseParser, AuthResponseParser>();
             services.TryAddTransient<IOidcClient, OidcClient>();
+            services.TryAddTransient<ISessionMonitor, SessionMonitor>();
             services.TryAddTransient<ILogoutRequestBuilder, LogoutRequestBuilder>();
             services.TryAddTransient<ILogoutResponseParser, LogoutResponseParser>();
             services.TryAddTransient<ILogoutClient, LogoutClient>();

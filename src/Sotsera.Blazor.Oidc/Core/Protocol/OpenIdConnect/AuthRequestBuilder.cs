@@ -92,7 +92,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             return HandleErrors(nameof(CreatePopupRequest), () => new OidcRequest
             {
                 Url = request.Url,
-                Timeout = request.Parameters.OpenPopupTimeout.Milliseconds,
+                Timeout = request.Parameters.OpenPopupTimeout.TotalMilliseconds,
                 WindowName = request.Parameters.PopupWindowName,
                 WindowFeatures = request.Parameters.PopupWindowFeatures
             });

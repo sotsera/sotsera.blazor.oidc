@@ -24,6 +24,7 @@ namespace Sotsera.Blazor.Oidc.Core
         private IOidcLogger<UserManager> Logger { get; }
         private IOidcClient OidcClient { get; }
         private ILogoutClient LogoutClient { get; }
+        private ISessionMonitor Monitor { get; }
         private IStore Store { get; }
         private Interop Interop { get; }
         private OidcHttpClient HttpClient { get; }
@@ -36,13 +37,14 @@ namespace Sotsera.Blazor.Oidc.Core
         public event Action<string> OnError;
 
         public UserManager(
-            IOidcClient oidcClient, ILogoutClient logoutClient, IStore store, 
-            IUriHelper uriHelper, Interop interop, OidcHttpClient httpClient, 
-            IOidcLogger<UserManager> logger
+            IOidcClient oidcClient, ILogoutClient logoutClient, ISessionMonitor monitor,
+            IStore store, IUriHelper uriHelper, Interop interop, 
+            OidcHttpClient httpClient, IOidcLogger<UserManager> logger
         )
         {
             OidcClient = oidcClient;
             LogoutClient = logoutClient;
+            Monitor = monitor;
             Store = store;
             UriHelper = uriHelper;
             Interop = interop;
@@ -114,6 +116,7 @@ namespace Sotsera.Blazor.Oidc.Core
                 UserState = userState;
                 UserChanged?.Invoke(User);
                 HttpClient.SetToken(userState.AccessToken);
+                Monitor.Start(userState);
             });
         }
 

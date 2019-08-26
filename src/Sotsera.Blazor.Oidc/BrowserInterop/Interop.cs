@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Sotsera.Blazor.Oidc.Core;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
+using Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model;
 
 namespace Sotsera.Blazor.Oidc.BrowserInterop
 {
@@ -24,6 +25,11 @@ namespace Sotsera.Blazor.Oidc.BrowserInterop
         {
             UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             return Runtime.InvokeAsync<object>(Consts.Interop.Init, DotNetObjectRef.Create(this));
+        }
+
+        public Task<string> PostToSessionFrame(OidcFrameRequest request)
+        {
+            return Runtime.InvokeAsync<string>(Consts.Interop.PostToSessionFrame, request);
         }
 
         public Task OpenPopup(OidcRequest request)
