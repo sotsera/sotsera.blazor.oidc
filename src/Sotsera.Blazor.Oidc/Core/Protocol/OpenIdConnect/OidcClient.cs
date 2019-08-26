@@ -83,8 +83,6 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
 
                 var userState = ResponseParser.ParseUserState(response, token, claims);
 
-                await Store.SetUserState(userState);
-
                 return userState;
             });
         }

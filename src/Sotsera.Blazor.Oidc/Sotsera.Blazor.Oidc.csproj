@@ -8,7 +8,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>Sotsera.Blazor.Oidc</AssemblyName>
     <RootNamespace>Sotsera.Blazor.Oidc</RootNamespace>
-    <Version>1.0.0-alpha-1</Version>
+    <Version>1.0.0-alpha-2</Version>
     <Authors>Alessandro Ghidini</Authors>
     <Company></Company>
     <Description>OpenID Connect (OIDC) client for Blazor client-side or hosted projects</Description>
@@ -31,6 +31,10 @@
     <None Include="Sotsera.Blazor.Oidc.csproj.DotSettings" Visible="false" />
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="" />
     <WebpackInputs Include="**\*.ts" Exclude="node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WebpackInputs Remove="BrowserInterop\core\frame.ts" />
   </ItemGroup>
 
   <PropertyGroup>

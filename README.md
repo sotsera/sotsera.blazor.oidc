@@ -83,7 +83,7 @@ The interaction with the authorization server can be made through a popup window
 
 The library already contains the **default** html pages used by the popup window callbacks and the callback page components for the redirect interaction type and their default URIs are automatically configured specifying the `baseUri` in the dependency injection. 
 
-For `preview8` the router can't load page components from a razor class library so the folling components must be added to the application in order to use the **redirect** interaction type:
+For `preview8` the router can't load page components from a razor class library so the following components must be added to the application in order to use the **redirect** interaction type:
 
 ```c#
 @page "/oidc/callbacks/authentication-redirect"

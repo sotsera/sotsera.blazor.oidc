@@ -20,6 +20,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.Discovery
         Task<string> TokenEndpoint();
         Task<string> UserinfoEndpoint();
         Task<string> EndSessionEndpoint();
+        Task<string> CheckSessionIframe();
         Task<Jwks> JsonWebKeys();
     }
 
@@ -91,6 +92,17 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.Discovery
                 return Endpoints.EndSessionEndpoint.IsNotEmpty()
                     ? Endpoints.EndSessionEndpoint
                     : throw Logger.Exception("Missing end session enpoint");
+            });
+        }
+
+        public Task<string> CheckSessionIframe()
+        {
+            return HandleErrors(nameof(CheckSessionIframe), async () =>
+            {
+                if (Endpoints.CheckSessionIframe.IsEmpty()) await LoadMetadata();
+                return Endpoints.CheckSessionIframe.IsNotEmpty()
+                    ? Endpoints.CheckSessionIframe
+                    : throw Logger.Exception("Missing end check session iframe enpoint");
             });
         }
 

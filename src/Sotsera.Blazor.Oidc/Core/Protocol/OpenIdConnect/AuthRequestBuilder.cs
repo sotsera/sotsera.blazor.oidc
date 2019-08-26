@@ -92,7 +92,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             return HandleErrors(nameof(CreatePopupRequest), () => new OidcRequest
             {
                 Url = request.Url,
-                Timeout = request.Parameters.OpenPopupTimeout.Milliseconds,
+                Timeout = request.Parameters.OpenPopupTimeout.TotalMilliseconds,
                 WindowName = request.Parameters.PopupWindowName,
                 WindowFeatures = request.Parameters.PopupWindowFeatures
             });
@@ -107,7 +107,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 {
                     ["grant_type"] = "authorization_code",
                     ["client_id"] = state.ClientId,
-                    //["client_secret"] = Parameters.Client.ClientSecret,// TODO: should this be in the AthenticationParameters?
+                    ["client_secret"] = Settings.ClientSecret, // TODO: should this be in the AthenticationParameters?
                     ["code_verifier"] = state.CodeVerifier,
                     ["code"] = response.Code,
                     ["redirect_uri"] = state.RedirectUri

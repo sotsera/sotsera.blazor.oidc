@@ -4,6 +4,9 @@
 *@
 
 @using Sotsera.Blazor.Toaster
+@inject Sotsera.Blazor.Oidc.IUserManager UserManager
+@inject IToaster Toaster
+
 <ToastContainer />
 
 <CascadingAuthenticationState>
@@ -22,3 +25,17 @@
         </AuthorizingContent>
     </Router>
 </CascadingAuthenticationState>
+
+@code
+{
+
+    protected override void OnInitialized()
+    {
+        UserManager.OnUserSessionExpiring += args =>
+        {
+            Toaster.Error("Authorization session expired");
+            args.Cancel = false;
+        };
+    }
+
+}
