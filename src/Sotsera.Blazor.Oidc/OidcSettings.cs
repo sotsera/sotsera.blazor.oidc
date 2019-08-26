@@ -16,7 +16,7 @@ namespace Sotsera.Blazor.Oidc
 
         public string Issuer { get; }
         public string ClientId { get; set; }
-        //public string ClientSecret { get; set; }
+        public string ClientSecret { get; set; }
         public string ResponseType { get; set; } = "code";
         public string Scope { get; set; } = "openid profile";
         public Prompt? Prompt { get; set; }
