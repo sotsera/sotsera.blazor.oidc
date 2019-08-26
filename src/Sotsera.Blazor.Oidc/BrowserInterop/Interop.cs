@@ -27,9 +27,14 @@ namespace Sotsera.Blazor.Oidc.BrowserInterop
             return Runtime.InvokeAsync<object>(Consts.Interop.Init, DotNetObjectRef.Create(this));
         }
 
-        public Task<string> PostToSessionFrame(OidcFrameRequest request)
+        public Task<string> InitSessionFrame(FrameSettings settings)
         {
-            return Runtime.InvokeAsync<string>(Consts.Interop.PostToSessionFrame, request);
+            return Runtime.InvokeAsync<string>(Consts.Interop.InitSessionFrame, settings);
+        }
+
+        public Task<string> PostToSessionFrame(string message)
+        {
+            return Runtime.InvokeAsync<string>(Consts.Interop.PostToSessionFrame, message);
         }
 
         public Task OpenPopup(OidcRequest request)

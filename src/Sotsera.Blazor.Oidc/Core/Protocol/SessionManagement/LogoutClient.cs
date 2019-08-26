@@ -15,7 +15,6 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
 {
     internal interface ILogoutClient
     {
-        Task RemoveUserState();
         Task<LogoutRequest> CreateLogoutRequest(string idToken, Action<LogoutParameters> configureParameters);
         OidcRequest CreatePopupRequest(LogoutRequest request);
         Task ParseResponse(string url);
@@ -40,8 +39,6 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             HttpClient = httpClient;
             Logger = logger;
         }
-
-        public Task RemoveUserState() => Store.RemoveUserState();
 
         public Task<LogoutRequest> CreateLogoutRequest(string idToken, Action<LogoutParameters> configureParameters)
         {

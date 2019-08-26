@@ -19,7 +19,10 @@ namespace Sotsera.Blazor.Oidc
 
         public void SetToken(string token)
         {
-            DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            DefaultRequestHeaders.Authorization = token.IsEmpty()
+                ? null
+                : new AuthenticationHeaderValue("Bearer", token);
         }
 
         public void RemoveToken()

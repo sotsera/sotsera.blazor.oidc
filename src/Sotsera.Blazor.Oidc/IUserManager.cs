@@ -16,6 +16,7 @@ namespace Sotsera.Blazor.Oidc
         string Version { get; }
 
         event Action<OidcUser> UserChanged;
+        event Action<UserSessionExpiringArgs> OnUserSessionExpiring;
         event Action<string> OnError;
 
         Task InitAsync(bool skipInitialStateValidation = false);

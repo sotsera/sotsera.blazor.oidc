@@ -2,10 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
-export interface IPostToSessionFrame {
+export interface ISessionFrameSettings {
     url: string;
     origin: string;
-    message: string;
     timeout: number;
 }
 
@@ -18,11 +17,11 @@ export class Frame {
         return this.frame.contentWindow as Window;
     }
 
-    constructor(request: IPostToSessionFrame) {
+    constructor(settings: ISessionFrameSettings) {
         this.frame = window.document.createElement("iframe") as HTMLIFrameElement;
-        this.frame.src = request.url;
+        this.frame.src = settings.url;
         this.frame.style.display = "none";
-        this.origin = request.origin;
+        this.origin = settings.origin;
     }
 
     load(): Promise<Frame> {

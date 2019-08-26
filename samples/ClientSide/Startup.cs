@@ -19,7 +19,7 @@ namespace ClientSide
             services.AddOidc(OidcSample.CodeWithShortLivedToken(new OidcSettings(issuerUri, baseUri)
             {
                 Scope = "openid profile email api",
-                MinimumLogeLevel = LogLevel.Debug,
+                MinimumLogeLevel = LogLevel.Information,
                 StorageType = StorageType.SessionStorage,
                 InteractionType = InteractionType.Popup
             }));

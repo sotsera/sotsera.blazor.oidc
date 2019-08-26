@@ -36,6 +36,7 @@ namespace Sotsera.Blazor.Oidc
             private const string Prefix = ".storage";
 
             public const string Init = Namespace + ".init";
+            public const string InitSessionFrame = Namespace + ".initSessionFrame";
             public const string PostToSessionFrame = Namespace + ".postToSessionFrame";
             public const string OpenPopup = Namespace + ".openPopup";
             public const string GetItem = Namespace + Prefix + ".getItem";

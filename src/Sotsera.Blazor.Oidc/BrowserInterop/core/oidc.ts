@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
-import { Frame, IPostToSessionFrame } from "./frame";
+import { Frame, ISessionFrameSettings } from "./frame";
 import { Popup, IOpenPopupRequest } from "./popup";
 import timeout from "../utils/timeout";
 
@@ -13,6 +13,7 @@ export interface IDotNetReference {
 
 export default class Oidc {
     private sessionFrame: Frame | undefined;
+    private sessionFrameTimeout: number = 5000;
     private popup: Popup | undefined;
     private interop: IDotNetReference | undefined;
 
@@ -21,11 +22,16 @@ export default class Oidc {
         return Promise.resolve();
     }
 
-    postToSessionFrame(request: IPostToSessionFrame): Promise<string> {
-        return timeout(request.timeout,
-            this.initCheckSession(request)
-                .then((frame) => frame.postToFrame(request.message))
-        );
+    async initSessionFrame(settings: ISessionFrameSettings): Promise<void> {
+        if (this.sessionFrame !== undefined) return Promise.resolve();
+        this.sessionFrame = await new Frame(settings).load();
+        this.sessionFrameTimeout = settings.timeout;
+        return Promise.resolve();
+    }
+
+    postToSessionFrame(message: string): Promise<string> {
+        if (this.sessionFrame === undefined) return Promise.reject("Check session service not initialized");
+        return timeout(this.sessionFrameTimeout, this.sessionFrame.postToFrame(message));
     }
 
     openPopup = (request: IOpenPopupRequest): Promise<void> => {
@@ -45,12 +51,6 @@ export default class Oidc {
         return new Promise<void>((resolve, reject) => {
             reject("Not implemented yet");
         });
-    }
-
-    private async initCheckSession(request: IPostToSessionFrame): Promise<Frame> {
-        return this.sessionFrame !== undefined
-            ? Promise.resolve(this.sessionFrame)
-            : this.sessionFrame = await new Frame(request).load();
     }
 
     private popupCallback = async (callbackName: string): Promise<void> => {

@@ -18,7 +18,7 @@ using Sotsera.Blazor.Oidc.Utilities;
 
 namespace Sotsera.Blazor.Oidc.Core
 {
-    internal class UserManager: IUserManager
+    internal class UserManager: IUserManager, IDisposable
     {
         private bool Initialized { get; set; }
         private IOidcLogger<UserManager> Logger { get; }
@@ -34,6 +34,7 @@ namespace Sotsera.Blazor.Oidc.Core
         public UserState UserState { get; private set; }
         public string Version { get; }
         public event Action<OidcUser> UserChanged;
+        public event Action<UserSessionExpiringArgs> OnUserSessionExpiring;
         public event Action<string> OnError;
 
         public UserManager(
@@ -51,6 +52,8 @@ namespace Sotsera.Blazor.Oidc.Core
             HttpClient = httpClient;
             Logger = logger;
             Version = GetType().InformationalVersion();
+
+            Monitor.OnSessionChanged += SessionChanged;
         }
 
         public Task InitAsync(bool skipInitialStateValidation = false)
@@ -70,11 +73,17 @@ namespace Sotsera.Blazor.Oidc.Core
 
                 if (!skipInitialStateValidation)
                 {
-                    await LoadUserState();
-                    if (UserState != null)
+                    var userState = await Store.GetUserState();
+                    if (userState != null)
                     {
-                        await CheckSessionAsync(false);
-                        await SilentLoginAsync(false);
+                        var sessionState = await Monitor.CheckSession(userState);
+                        Logger.LogDebug(sessionState.Message);
+                        if (sessionState.Type == CheckSessionResultType.Valid)
+                        {
+                            UpdateUserState(userState, false);
+                            await Monitor.Start(UserState);
+                        }
+                        //await SilentLoginAsync(false);
                     }
                 }
 
@@ -113,28 +122,27 @@ namespace Sotsera.Blazor.Oidc.Core
 
                 var userState = await OidcClient.ParseResponse(url);
 
-                UserState = userState;
-                UserChanged?.Invoke(User);
-                HttpClient.SetToken(userState.AccessToken);
-                Monitor.Start(userState);
+                await Store.SetUserState(userState);
+                UpdateUserState(userState, true);
+                await Monitor.Start(userState);
             });
         }
 
         public Task BeginLogoutAsync(Action<LogoutParameters> configureParameters = null)
         {
             if (UserState == null) return Task.CompletedTask;
+            Monitor.Stop();
             
             return HandleErrors(nameof(BeginLogoutAsync), async () =>
             {
                 await InitAsync(true); //Needed for redirect callback
 
-                var userState = UserState;
+                var idToken = UserState.IdToken;
                 
-                var request = await LogoutClient.CreateLogoutRequest(userState.IdToken, configureParameters);
+                var request = await LogoutClient.CreateLogoutRequest(idToken, configureParameters);
                 
-                UserState = null;
-                HttpClient.RemoveToken();
-                await LogoutClient.RemoveUserState();
+                UpdateUserState(null, true);
+                await Store.RemoveUserState();
 
                 if (request.Parameters.InteractionType.IsRedirect())
                 {
@@ -156,14 +164,6 @@ namespace Sotsera.Blazor.Oidc.Core
                 await LogoutClient.ParseResponse(url);
             });
         }
-        
-        private Task LoadUserState()
-        {
-            return HandleErrors(nameof(LoadUserState), async () =>
-            {
-                UserState = await Store.GetUserState();
-            });
-        }
 
         private async Task HandleErrors(string methodName, Func<Task> action)
         {
@@ -179,11 +179,18 @@ namespace Sotsera.Blazor.Oidc.Core
             }
         }
 
+        private void UpdateUserState(UserState userState, bool raiseEvent)
+        {
+            UserState = userState;
+            if(raiseEvent) UserChanged?.Invoke(userState?.User);
+            HttpClient.SetToken(userState?.AccessToken);
+        }
+
         private void RaiseInitializationError()
         {
             var projectName = typeof(IUserManager).Namespace;
             var fileVersion = $"_content/{projectName}/{projectName.ToLower()}-{Version}.js";
-            var errorMessage = "Check if the index.html file references the correct js version:";
+            const string errorMessage = "Check if the index.html file references the correct js version:";
             var line = new string('-', Math.Max(errorMessage.Length, fileVersion.Length));
 
             Logger.LogError(line);
@@ -191,6 +198,27 @@ namespace Sotsera.Blazor.Oidc.Core
             Logger.LogError(fileVersion);
             Logger.LogError(line);
             throw Logger.Exception($"Unable to initialize the {projectName} javascript library");
+        }
+
+        private void SessionChanged(CheckSessionResult sessionState)
+        {
+            if (sessionState.Type == CheckSessionResultType.Changed)
+            {
+                var args = new UserSessionExpiringArgs();
+                OnUserSessionExpiring?.Invoke(args);
+
+                if (!args.Cancel)
+                {
+                    UpdateUserState(null, true);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Monitor.OnSessionChanged -= SessionChanged;
+            Monitor?.Dispose();
+            HttpClient?.Dispose();
         }
     }
 }

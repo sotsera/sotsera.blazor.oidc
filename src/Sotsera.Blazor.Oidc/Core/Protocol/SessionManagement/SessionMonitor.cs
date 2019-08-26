@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Sotsera.Blazor.Oidc.BrowserInterop;
 using Sotsera.Blazor.Oidc.Core.Common;
@@ -16,8 +17,10 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
 {
     public interface ISessionMonitor: IDisposable
     {
-        void Start(UserState state);
+        Task Start(UserState state);
         void Stop();
+        Task<CheckSessionResult> CheckSession(UserState state);
+        event Action<CheckSessionResult> OnSessionChanged;
     }
 
     internal class SessionMonitor: ThrowsErrors<SessionMonitor>, ISessionMonitor
@@ -27,6 +30,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
         private IMetadataService Metadata { get; }
         protected override IOidcLogger<SessionMonitor> Logger { get; }
 
+        private bool Initialized { get; set; }
         private UserState State { get; set; }
         private Timer Timer { get; }
         
@@ -41,15 +45,12 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             Timer = new Timer(TimerCallback, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        public void Start(UserState state)
+        public Task Start(UserState state)
         {
-            HandleErrors(nameof(Start), () =>
+            return HandleErrors(nameof(Start), async () =>
             {
-                Stop();
-                
-                Logger.ThrowIf(state?.SessionState == null, "Session monitor called with an empty session state");
+                await Init(state);
 
-                State = state;
                 Timer.Change(Settings.CheckSessionInterval, Settings.CheckSessionInterval);
             });
         }
@@ -62,55 +63,70 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             });
         }
 
-        private async void TimerCallback(object timerState)
+        public async Task<CheckSessionResult> CheckSession(UserState state)
         {
-            var url = await Metadata.CheckSessionIframe();
+            await Init(state);
+            return await PostMessage();
+        }
 
-            var request = new OidcFrameRequest
-            {
-                Url = await Metadata.CheckSessionIframe(),
-                Origin = new Uri(url).GetLeftPart(UriPartial.Authority),
-                Message = $"{Settings.ClientId} {State.SessionState}",
-                Timeout = Settings.CheckSessionTimeout.TotalMilliseconds
-            };
+        private async Task<CheckSessionResult> PostMessage()
+        {
+            var sessionState = await Interop.PostToSessionFrame($"{Settings.ClientId} {State.SessionState}");
 
-            var result = await Interop.PostToSessionFrame(request);
-
-            switch (result)
+            switch (sessionState)
             {
                 case "error":
-                    if (Settings.CheckSessionStopOnError) Stop();
-                    LogAndRaiseSessionEvent(CheckSessionResultType.Error, result);
-                    break;
+                    return new CheckSessionResult(CheckSessionResultType.Error, sessionState);
                 case "changed":
-                    Stop();
-                    LogAndRaiseSessionEvent(CheckSessionResultType.Changed, result);
-                    break;
+                    return new CheckSessionResult(CheckSessionResultType.Changed, sessionState);
                 default:
                 case "unchanged":
-                    LogAndRaiseSessionEvent(CheckSessionResultType.Valid, result);
-                    break;
+                    return new CheckSessionResult(CheckSessionResultType.Valid, sessionState);
             }
         }
 
-        private void LogAndRaiseSessionEvent(CheckSessionResultType type, string message)
-        {
-            var result = new CheckSessionResult(type, message);
+        private async Task Init(UserState state)
+        {               
+            Stop();
+            Logger.ThrowIf(state?.SessionState == null, "Session monitor called with an empty session state");
+            State = state;
 
-            switch (type)
+            if (Initialized) return;
+
+            var url = await Metadata.CheckSessionIframe();
+
+            var settings = new FrameSettings
+            {
+                Url = await Metadata.CheckSessionIframe(),
+                Origin = new Uri(url).GetLeftPart(UriPartial.Authority),
+                Timeout = Settings.CheckSessionTimeout.TotalMilliseconds
+            };
+
+            await Interop.InitSessionFrame(settings);
+
+            Initialized = true;
+        }
+
+        private async void TimerCallback(object timerState)
+        {
+            var result = await PostMessage();
+
+            switch (result.Type)
             {
                 case CheckSessionResultType.Error:
+                    if (Settings.CheckSessionStopOnError) Stop();
                     Logger.LogError(result.Message);
+                    OnSessionChanged?.Invoke(result);
                     break;
                 case CheckSessionResultType.Changed:
+                    Stop();
                     Logger.LogInformation(result.Message);
+                    OnSessionChanged?.Invoke(result);
                     break;
                 case CheckSessionResultType.Valid:
                     Logger.LogDebug(result.Message);
                     break;
             }
-
-            OnSessionChanged?.Invoke(result);
         }
 
         public void Dispose()
