@@ -21,6 +21,7 @@ namespace Sotsera.Blazor.Oidc.Core
     internal class UserManager: IUserManager, IDisposable
     {
         private bool Initialized { get; set; }
+        private bool SessionIsValid { get; set; }
         private IOidcLogger<UserManager> Logger { get; }
         private IOidcClient OidcClient { get; }
         private ILogoutClient LogoutClient { get; }
@@ -77,11 +78,10 @@ namespace Sotsera.Blazor.Oidc.Core
                     if (userState != null)
                     {
                         var sessionState = await Monitor.CheckSession(userState);
-                        Logger.LogDebug(sessionState.Message);
+
                         if (sessionState.Type == CheckSessionResultType.Valid)
                         {
-                            UpdateUserState(userState, false);
-                            await Monitor.Start(UserState);
+                            await UpdateUserState(userState, false, false);
                         }
                         //await SilentLoginAsync(false);
                     }
@@ -122,27 +122,24 @@ namespace Sotsera.Blazor.Oidc.Core
 
                 var userState = await OidcClient.ParseResponse(url);
 
-                await Store.SetUserState(userState);
-                UpdateUserState(userState, true);
-                await Monitor.Start(userState);
+                await UpdateUserState(userState, true, true);
             });
         }
 
         public Task BeginLogoutAsync(Action<LogoutParameters> configureParameters = null)
         {
-            if (UserState == null) return Task.CompletedTask;
-            Monitor.Stop();
-            
             return HandleErrors(nameof(BeginLogoutAsync), async () =>
             {
+                if (!SessionIsValid) await UpdateUserState(null, true, true);
+                if (UserState == null) return;
+
                 await InitAsync(true); //Needed for redirect callback
 
                 var idToken = UserState.IdToken;
                 
                 var request = await LogoutClient.CreateLogoutRequest(idToken, configureParameters);
                 
-                UpdateUserState(null, true);
-                await Store.RemoveUserState();
+                await UpdateUserState(null, true, true);
 
                 if (request.Parameters.InteractionType.IsRedirect())
                 {
@@ -179,11 +176,26 @@ namespace Sotsera.Blazor.Oidc.Core
             }
         }
 
-        private void UpdateUserState(UserState userState, bool raiseEvent)
+        private async Task UpdateUserState(UserState userState, bool raiseEvent, bool updateStore)
         {
             UserState = userState;
+
+            if (UserState == null)
+            {
+                SessionIsValid = false;
+                Monitor.Stop();
+                await Store.RemoveUserState();
+                HttpClient.RemoveToken();
+            }
+            else
+            {
+                SessionIsValid = true;
+                await Monitor.Start(UserState);
+                await Store.SetUserState(userState);
+                HttpClient.SetToken(UserState.AccessToken);
+            }
+
             if(raiseEvent) UserChanged?.Invoke(userState?.User);
-            HttpClient.SetToken(userState?.AccessToken);
         }
 
         private void RaiseInitializationError()
@@ -200,17 +212,14 @@ namespace Sotsera.Blazor.Oidc.Core
             throw Logger.Exception($"Unable to initialize the {projectName} javascript library");
         }
 
-        private void SessionChanged(CheckSessionResult sessionState)
+        private async void SessionChanged(CheckSessionResult sessionState)
         {
             if (sessionState.Type == CheckSessionResultType.Changed)
             {
                 var args = new UserSessionExpiringArgs();
                 OnUserSessionExpiring?.Invoke(args);
 
-                if (!args.Cancel)
-                {
-                    UpdateUserState(null, true);
-                }
+                await UpdateUserState(null, !args.Cancel, true);
             }
         }
 
