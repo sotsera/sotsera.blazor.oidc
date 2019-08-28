@@ -1,5 +1,12 @@
 <Project>
   <PropertyGroup>
     <AspNetCoreVersion>3.0.0-preview8.19405.7</AspNetCoreVersion>
+    <Authors>Alessandro Ghidini</Authors>
+    <Company></Company>
+    <Copyright>Alessandro Ghidini</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
