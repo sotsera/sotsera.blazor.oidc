@@ -18,7 +18,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
     internal interface IOidcClient
     {
         Task<AuthRequest> CreateAuthenticationRequest(Action<AuthParameters> configureParameters);
-        OidcRequest CreatePopupRequest(AuthRequest request);
+        OidcRequest CreateBrowserRequest(AuthRequest request);
         Task<UserState> ParseResponse(string url);
     }
 
@@ -53,9 +53,9 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             });
         }
 
-        public OidcRequest CreatePopupRequest(AuthRequest request)
+        public OidcRequest CreateBrowserRequest(AuthRequest request)
         {
-            return HandleErrors(nameof(CreatePopupRequest), () => RequestBuilder.CreatePopupRequest(request));
+            return HandleErrors(nameof(CreateBrowserRequest), () => RequestBuilder.CreateBrowserRequest(request));
         }
 
         public Task<UserState> ParseResponse(string url)

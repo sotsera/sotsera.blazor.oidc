@@ -16,7 +16,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
     internal interface ILogoutClient
     {
         Task<LogoutRequest> CreateLogoutRequest(string idToken, Action<LogoutParameters> configureParameters);
-        OidcRequest CreatePopupRequest(LogoutRequest request);
+        OidcRequest CreateBrowserRequest(LogoutRequest request);
         Task ParseResponse(string url);
     }
 
@@ -58,9 +58,9 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             });
         }
         
-        public OidcRequest CreatePopupRequest(LogoutRequest request)
+        public OidcRequest CreateBrowserRequest(LogoutRequest request)
         {
-            return HandleErrors(nameof(CreatePopupRequest), () => RequestBuilder.CreatePopupRequest(request));
+            return HandleErrors(nameof(CreateBrowserRequest), () => RequestBuilder.CreateBrowserRequest(request));
         }
 
         public Task ParseResponse(string url)

@@ -18,7 +18,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
     {
         Task<LogoutParameters> CreateLogoutParameters(string idToken, Action<LogoutParameters> configureParameters);
         LogoutRequest CreateLogoutRequest(LogoutParameters parameters);
-        OidcRequest CreatePopupRequest(LogoutRequest request);
+        OidcRequest CreateBrowserRequest(LogoutRequest request);
     }
 
     internal class LogoutRequestBuilder: ThrowsErrors<LogoutRequestBuilder>,  ILogoutRequestBuilder
@@ -56,10 +56,11 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             });
         }
 
-        public OidcRequest CreatePopupRequest(LogoutRequest request)
+        public OidcRequest CreateBrowserRequest(LogoutRequest request)
         {
-            return HandleErrors(nameof(CreatePopupRequest), () => new OidcRequest
+            return HandleErrors(nameof(CreateBrowserRequest), () => new OidcRequest
             {
+                InteractionType = request.Parameters.InteractionType,
                 Url = request.Url,
                 Timeout = request.Parameters.OpenPopupTimeout.TotalMilliseconds,
                 WindowName = request.Parameters.PopupWindowName,

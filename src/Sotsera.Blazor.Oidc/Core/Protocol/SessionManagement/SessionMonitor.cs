@@ -15,7 +15,7 @@ using Sotsera.Blazor.Oidc.Utilities;
 
 namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
 {
-    public interface ISessionMonitor: IDisposable
+    internal interface ISessionMonitor: IDisposable
     {
         Task Start(UserState state);
         void Stop();

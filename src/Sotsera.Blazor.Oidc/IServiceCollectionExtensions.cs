@@ -37,30 +37,31 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<OidcHttpClient>();
             services.TryAddScoped<IUserManager, UserManager>();
 
-            services.TryAddTransient(typeof(IOidcLogger<>), typeof(OidcLogger<>));
-            services.TryAddTransient<IMetadataService, MetadataService>();
-            services.TryAddTransient<ISignatureValidatorFactory, SignatureValidatorFactory>();
-            services.TryAddTransient<IJwtValidator, JwtValidator>();
-            services.TryAddTransient<ITokenParser, TokenParser>();
-            services.TryAddTransient<ITokenRevocationClient, TokenRevocationClient>();
-            services.TryAddTransient<IAuthRequestBuilder, AuthRequestBuilder>();
-            services.TryAddTransient<IAuthResponseParser, AuthResponseParser>();
-            services.TryAddTransient<IOidcClient, OidcClient>();
-            services.TryAddTransient<ISessionMonitor, SessionMonitor>();
-            services.TryAddTransient<ILogoutRequestBuilder, LogoutRequestBuilder>();
-            services.TryAddTransient<ILogoutResponseParser, LogoutResponseParser>();
-            services.TryAddTransient<ILogoutClient, LogoutClient>();
-            services.TryAddTransientStorage(settings);
+            services.TryAddScoped(typeof(IOidcLogger<>), typeof(OidcLogger<>));
+            services.TryAddScoped<IMetadataService, MetadataService>();
+            services.TryAddScoped<ISignatureValidatorFactory, SignatureValidatorFactory>();
+            services.TryAddScoped<IJwtValidator, JwtValidator>();
+            services.TryAddScoped<ITokenParser, TokenParser>();
+            services.TryAddScoped<ITokenRevocationClient, TokenRevocationClient>();
+            services.TryAddScoped<IAuthRequestBuilder, AuthRequestBuilder>();
+            services.TryAddScoped<IAuthResponseParser, AuthResponseParser>();
+            services.TryAddScoped<IUserManagerHelper, UserManagerHelper>();
+            services.TryAddScoped<IOidcClient, OidcClient>();
+            services.TryAddScoped<ISessionMonitor, SessionMonitor>();
+            services.TryAddScoped<ILogoutRequestBuilder, LogoutRequestBuilder>();
+            services.TryAddScoped<ILogoutResponseParser, LogoutResponseParser>();
+            services.TryAddScoped<ILogoutClient, LogoutClient>();
+            services.TryAddScopedStorage(settings);
 
             return services;
         }
 
-        private static void TryAddTransientStorage(this IServiceCollection services, OidcSettings settings)
+        private static void TryAddScopedStorage(this IServiceCollection services, OidcSettings settings)
         {
-            services.TryAddTransient<IStore, Store>();
+            services.TryAddScoped<IStore, Store>();
 
             if (settings.StorageType.IsMemory())
-                services.TryAddTransient<IStorage, MemoryStorage>();
+                services.TryAddScoped<IStorage, MemoryStorage>();
             else
                 services.TryAddTransient<IStorage, BrowserStorage>();
         }

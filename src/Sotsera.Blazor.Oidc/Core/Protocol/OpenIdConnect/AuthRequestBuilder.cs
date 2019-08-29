@@ -22,7 +22,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
     {
         Task<AuthParameters> CreateAuthParameters(Action<AuthParameters> configureParameters);
         AuthRequest CreateAuthRequest(AuthParameters parameters);
-        OidcRequest CreatePopupRequest(AuthRequest request);
+        OidcRequest CreateBrowserRequest(AuthRequest request);
         Task<TokenRequest> CreateCodeRequest(AuthState state, AuthResponse code);
         Task<UserInfoRequest> CreateUserInfoRequest();
     }
@@ -87,10 +87,11 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             });
         }
 
-        public OidcRequest CreatePopupRequest(AuthRequest request)
+        public OidcRequest CreateBrowserRequest(AuthRequest request)
         {
-            return HandleErrors(nameof(CreatePopupRequest), () => new OidcRequest
+            return HandleErrors(nameof(CreateBrowserRequest), () => new OidcRequest
             {
+                InteractionType = request.Parameters.InteractionType,
                 Url = request.Url,
                 Timeout = request.Parameters.OpenPopupTimeout.TotalMilliseconds,
                 WindowName = request.Parameters.PopupWindowName,

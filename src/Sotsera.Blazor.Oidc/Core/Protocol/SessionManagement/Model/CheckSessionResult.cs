@@ -4,10 +4,12 @@
 
 namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model
 {
-    public class CheckSessionResult
+    internal class CheckSessionResult
     {
         public CheckSessionResultType Type { get; set; }
         public string Message { get; }
+
+        public bool IsValid => Type == CheckSessionResultType.Valid;
 
         public CheckSessionResult(CheckSessionResultType type, string message)
         {
