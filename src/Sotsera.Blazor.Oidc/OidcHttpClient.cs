@@ -11,9 +11,9 @@ namespace Sotsera.Blazor.Oidc
 {
     public class OidcHttpClient : HttpClient
     {
-        public OidcHttpClient(OidcSettings settings, IUriHelper uriHelper)
+        public OidcHttpClient(OidcSettings settings, NavigationManager navigationManager)
         {
-            BaseAddress = new Uri(uriHelper.GetBaseUri());
+            BaseAddress = new Uri(navigationManager.Uri);
             Timeout = settings.HttpClientTimeout;
         }
 

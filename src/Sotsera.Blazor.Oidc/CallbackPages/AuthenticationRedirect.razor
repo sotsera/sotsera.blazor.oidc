@@ -4,15 +4,16 @@
     Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 *@
 @page "/oidc/callbacks/authentication-redirect"
-@inject Microsoft.AspNetCore.Components.IUriHelper UriHelper
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @inject IUserManager UserManager
+@layout EmptyLayout
 
 Validating authentication...
 
 @code {
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        await UserManager.CompleteAuthenticationAsync(UriHelper.GetAbsoluteUri());
-        UriHelper.NavigateTo("/");
+        await UserManager.CompleteAuthenticationAsync(NavigationManager.Uri);
+        NavigationManager.NavigateTo("/");
     }
 }

@@ -10,7 +10,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="$(AspNetCoreVersion)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="$(AspNetCoreVersion)" PrivateAssets="all" />
-    <PackageReference Include="Sotsera.Blazor.Toaster" Version="1.0.0-preview.8.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Sotsera.Blazor.Toaster" Version="1.0.0-preview9.1" />
   </ItemGroup>
 
   <ItemGroup>

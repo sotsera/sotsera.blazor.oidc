@@ -1,5 +1,4 @@
 using System;
-using Microsoft.AspNetCore.Blazor.Services;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,16 +12,17 @@ namespace ClientSide
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var issuerUri = new Uri("https://demo.identityserver.io");
-            var baseUri = new Uri(WebAssemblyUriHelper.Instance.GetBaseUri());
-
-            services.AddOidc(OidcSample.CodeWithShortLivedToken(new OidcSettings(issuerUri, baseUri)
+            services.AddOidc(new Uri("https://demo.identityserver.io"), (settings, siteUri) =>
             {
-                Scope = "openid profile email api",
-                MinimumLogeLevel = LogLevel.Information,
-                StorageType = StorageType.SessionStorage,
-                InteractionType = InteractionType.Popup
-            }));
+                settings.UseDefaultCallbackUris(siteUri);
+                settings.UseDemoFlow().Code(); // Just for this demo: allows to quickly change to one of the supported flows
+                settings.Scope = "openid profile email api";
+
+                settings.MinimumLogeLevel = LogLevel.Information;
+                settings.StorageType = StorageType.SessionStorage;
+                settings.InteractionType = InteractionType.Popup;
+            });
+
             services.AddToaster(c => c.PositionClass = Defaults.Classes.Position.BottomRight);
         }
 

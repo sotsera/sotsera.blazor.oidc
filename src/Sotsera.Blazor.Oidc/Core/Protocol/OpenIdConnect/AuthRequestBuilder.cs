@@ -68,11 +68,6 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 {
                     throw Logger.Exception("Response type must be " + string.Join(" OR ", validResopnseTypes));
                 }
-
-                if (Settings.StorageType.IsMemory() && parameters.InteractionType.IsRedirect())
-                {
-                    throw Logger.Exception("Interaction type cannot be redirect using memory storage");
-                }
             });
         }
 

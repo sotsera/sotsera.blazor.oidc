@@ -89,24 +89,32 @@ namespace Sotsera.Blazor.Oidc
 
         #endregion
 
-        public OidcSettings(Uri issuer, Uri baseCallbackUri = null)
+        public OidcSettings(Uri issuer)
         {
             if (issuer == null) throw new ArgumentNullException(nameof(issuer));
 
             Issuer = issuer.AbsoluteUri;
-
             MetadataEndpoint = $"{Issuer}.well-known/openid-configuration";
+        }
+    }
 
-            if (baseCallbackUri == null) return;
+    public static class OidcSettingsExtensions
+    {
+        public static OidcSettings UseDefaultCallbackUris(this OidcSettings settings, Uri baseCallbackUri)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (baseCallbackUri == null) throw new ArgumentNullException(nameof(baseCallbackUri));
 
             const string routePath = "oidc/callbacks/";
             const string pagePath = "_content/Sotsera.Blazor.Oidc/";
 
-            AuthenticationRedirectCallbackUri = $"{baseCallbackUri}{routePath}authentication-redirect";
-            LogoutRedirectCallbackUri = $"{baseCallbackUri}{routePath}logout-redirect";
-            AuthenticationPopupCallbackUri = $"{baseCallbackUri}{pagePath}authentication-popup.html";
-            LogoutPopupCallbackUri = $"{baseCallbackUri}{pagePath}logout-popup.html";
-            SilentRenewCallbackUri = $"{baseCallbackUri}{pagePath}silent-renew.html";
+            settings.AuthenticationRedirectCallbackUri = $"{baseCallbackUri}{routePath}authentication-redirect";
+            settings.LogoutRedirectCallbackUri = $"{baseCallbackUri}{routePath}logout-redirect";
+            settings.AuthenticationPopupCallbackUri = $"{baseCallbackUri}{pagePath}authentication-popup.html";
+            settings.LogoutPopupCallbackUri = $"{baseCallbackUri}{pagePath}logout-popup.html";
+            settings.SilentRenewCallbackUri = $"{baseCallbackUri}{pagePath}silent-renew.html";
+
+            return settings;
         }
     }
 }

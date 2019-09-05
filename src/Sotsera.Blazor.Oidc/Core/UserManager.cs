@@ -135,17 +135,18 @@ namespace Sotsera.Blazor.Oidc.Core
             });
         }
 
-        private async Task HandleErrors(string methodName, Func<Task> action)
+        private Task HandleErrors(string methodName, Func<Task> action)
         {
             try
             {
                 Logger.LogTrace($"{nameof(UserManager)}.{methodName}");
-                await action.Invoke();
+                return action.Invoke();
             }
             catch (Exception ex)
             {
                 if (!(ex is OidcException oidcException) || !oidcException.Logged) Logger.LogError(ex.Message);
                 OnError?.Invoke(ex.Message);
+                return Task.CompletedTask;
             }
         }
 

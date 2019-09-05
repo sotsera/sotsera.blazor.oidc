@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Sotsera.Blazor.Oidc.Core.Common;
 
 namespace Sotsera.Blazor.Oidc
