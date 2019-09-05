@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
+using System;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -25,20 +26,16 @@ namespace Microsoft.Extensions.DependencyInjection
     // ReSharper disable once InconsistentNaming
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection AddOidc(this IServiceCollection services, OidcSettings settings)
+        public static IServiceCollection AddOidc(this IServiceCollection services, Uri issuer, Action<OidcSettings, Uri> configure)
         {
-            new OidcSettingsValidator().EnsureValidSettings(services, settings);
-
             services.AddAuthorizationCore();
-
-            services.TryAddScoped(settings);
             services.TryAddScoped<Metadata>();
             services.TryAddScoped<Interop>(); //TODO: ensure that IJSRuntime is singleton too
             services.TryAddScoped<AuthenticationStateProvider, AuthStateProvider>();
             services.TryAddScoped<OidcHttpClient>();
             services.TryAddScoped<IUserManager, UserManager>();
 
-            services.TryAddScoped(typeof(IOidcLogger<>), typeof(OidcLogger<>));
+            services.TryAddScoped(typeof(IOidcLogger<>), typeof(OidcLogger<>)); // remove this when this will be published (https://github.com/aspnet/AspNetCore/pull/12928)
             services.TryAddScoped<IMetadataService, MetadataService>();
             services.TryAddScoped<ISignatureValidatorFactory, SignatureValidatorFactory>();
             services.TryAddScoped<IJwtValidator, JwtValidator>();
@@ -52,24 +49,30 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<ILogoutRequestBuilder, LogoutRequestBuilder>();
             services.TryAddScoped<ILogoutResponseParser, LogoutResponseParser>();
             services.TryAddScoped<ILogoutClient, LogoutClient>();
-            services.TryAddScopedStorage(settings);
-
-            return services;
-        }
-
-        private static void TryAddScopedStorage(this IServiceCollection services, OidcSettings settings)
-        {
             services.TryAddScoped<IStore, Store>();
 
-            if (settings.StorageType.IsMemory())
-                services.TryAddScoped<IStorage, MemoryStorage>();
-            else
-                services.TryAddTransient<IStorage, BrowserStorage>();
-        }
+            services.TryAddScoped<IStorage>(p =>
+            {
+                var settings = p.GetRequiredService<OidcSettings>();
+                
+                if (settings.StorageType.IsMemory())
+                    return new MemoryStorage();
+                
+                var interop = p.GetRequiredService<Interop>();
+                var logger = p.GetRequiredService<IOidcLogger<BrowserStorage>>();
+                return new BrowserStorage(settings, interop, logger);
+            });
 
-        private static void TryAddScoped<T>(this IServiceCollection services, T instance) where T : class
-        {
-            services.TryAddScoped(provider => instance);
+            services.TryAddScoped(b =>
+            {
+                var navigationManager = b.GetRequiredService<NavigationManager>();
+                var settings = new OidcSettings(issuer);
+                configure?.Invoke(settings, new Uri(navigationManager.BaseUri));
+                new OidcSettingsValidator().EnsureValidSettings(services, settings);
+                return settings;
+            });
+
+            return services;
         }
     }
 }
