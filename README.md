@@ -22,27 +22,27 @@ Add a reference to the library from [![NuGet Pre Release](https://img.shields.io
 ### Dependency injection configuration
 The library with its configuration settings must be added to the `Startup.cs` class.
 
-The minimal configuration for connecting through a popup window to an Authorization server using the default callback URIs requires:
+The minimal configuration for connecting to an Authorization server using the default callback URIs requires:
 
 - The issuer (Authorization server) URI
-- The applcation base URI used to construct the default html callback URIs
+- The application base URI used to construct the default html callback URIs
 - The client ID
 - The response Type for **implicit flow** or **code+pkce**
 - The scopes for the access token
+
+The current application base URI is passed along to the settings object for configuring the default callback URIs but can also be used for setting other environment sensitive values.
 
 As an example, the configuration for the code+pkce flow to the Identity server demo instance is:
 
 ```c#
 public void ConfigureServices(IServiceCollection services)
 {
-    var issuerUri = new Uri("https://demo.identityserver.io");
-    var baseUri = new Uri(WebAssemblyUriHelper.Instance.GetBaseUri());
-
-    services.AddOidc(new OidcSettings(issuerUri, baseUri)
+    services.AddOidc(new Uri("https://demo.identityserver.io"), (settings, siteUri) =>
     {
-        ClientId = "spa",
-        ResponseType = "code",
-        Scope = "openid profile email api"
+        settings.UseDefaultCallbackUris(siteUri);
+        settings.ClientId = "spa";
+        settings.ResponseType = "code";
+        settings.Scope = "openid profile email api";
     });
 }
 ```
@@ -51,53 +51,41 @@ public void ConfigureServices(IServiceCollection services)
 Add the following reference to the oidc javascript in the __index.html__ file paying attention to match the library version:
 
 ```c#
-<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-1.js"></script>
+<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-3.js"></script>
 ```
 
 ### Blazor Authorization 
-Surround the default **router** in the **App.razor** component with a `CascadingAuthenticationState` component:
+The default **router** in the **App.razor** has to be updated:
 
 ```html
-<CascadingAuthenticationState>
-    <Router AppAssembly="typeof(Program).Assembly">
-        <NotFoundContent>
-            <p>Sorry, there's nothing at this address.</p>
-        </NotFoundContent>
-        <NotAuthorizedContent>
-            <h1>Sorry</h1>
-            <p>You're not authorized to reach this page.</p>
-            <p>You may need to log in as a different user.</p>
-        </NotAuthorizedContent>
-        <AuthorizingContent>
-            <h1>Authentication in progress</h1>
-            <p>Only visible while authentication is in progress.</p>
-        </AuthorizingContent>
-    </Router>
-</CascadingAuthenticationState>
-```
+@using Sotsera.Blazor.Oidc
+@inject IUserManager UserManager
 
-The example above specifies also the content that will be injected by the router in the `@body` part of a page that requires athorization through the `@attribute [Authorize]` when there is a pending authentication or the user is not authorized.
+<Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(IUserManager).Assembly }">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                <p>You're not authorized to reach this page.</p>
+            </NotAuthorized>
+            <Authorizing>
+                <h3>Authentication in progress</h3>
+            </Authorizing>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <CascadingAuthenticationState>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </CascadingAuthenticationState>
+    </NotFound>
+</Router>
+```
 
 ### Authorization server callbacks
 The interaction with the authorization server can be made through a popup window or performing a redirect. 
 
-The library already contains the **default** html pages used by the popup window callbacks and the callback page components for the redirect interaction type and their default URIs are automatically configured specifying the `baseUri` in the dependency injection. 
-
-For `preview8` the router can't load page components from a razor class library so the following components must be added to the application in order to use the **redirect** interaction type:
-
-```c#
-@page "/oidc/callbacks/authentication-redirect"
-@using Sotsera.Blazor.Oidc.CallbackPages
-
-<AuthenticationRedirect />
-```
-
-```c#
-@page "/oidc/callbacks/logout-redirect"
-@using Sotsera.Blazor.Oidc.CallbackPages
-
-<LogoutRedirect />
-```
+The library already contains the **default** html pages used by the popup window callbacks and the callback page components for the redirect interaction type and their default URIs are automatically configured by the `UseDefaultCallbackUris`. 
 
 ## Usage
 
