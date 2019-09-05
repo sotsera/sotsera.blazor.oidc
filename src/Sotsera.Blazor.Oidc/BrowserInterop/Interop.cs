@@ -21,40 +21,40 @@ namespace Sotsera.Blazor.Oidc.BrowserInterop
             Runtime = runtime;
         }
 
-        internal ValueTask Init(UserManager userManager)
+        internal async Task Init(UserManager userManager)
         {
             UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            return Runtime.InvokeVoidAsync(Consts.Interop.Init, DotNetObjectReference.Create(this));
+            await Runtime.InvokeVoidAsync(Consts.Interop.Init, DotNetObjectReference.Create(this));
         }
 
-        public ValueTask<string> InitSessionFrame(FrameSettings settings)
+        public async Task<string> InitSessionFrame(FrameSettings settings)
         {
-            return Runtime.InvokeAsync<string>(Consts.Interop.InitSessionFrame, settings);
+            return await Runtime.InvokeAsync<string>(Consts.Interop.InitSessionFrame, settings);
         }
 
-        public ValueTask<string> PostToSessionFrame(string message)
+        public async Task<string> PostToSessionFrame(string message)
         {
-            return Runtime.InvokeAsync<string>(Consts.Interop.PostToSessionFrame, message);
+            return await Runtime.InvokeAsync<string>(Consts.Interop.PostToSessionFrame, message);
         }
 
-        public ValueTask OpenPopup(OidcRequest request)
+        public async Task OpenPopup(OidcRequest request)
         {
-            return Runtime.InvokeVoidAsync(Consts.Interop.OpenPopup, request);
+            await Runtime.InvokeVoidAsync(Consts.Interop.OpenPopup, request);
         }
 
-        public ValueTask<string> GetAsync<T>(string storageType, string key)
+        public async Task<string> GetAsync<T>(string storageType, string key)
         {
-            return Runtime.InvokeAsync<string>($"{storageType}.getItem", key);
+            return await Runtime.InvokeAsync<string>($"{storageType}.getItem", key);
         }
 
-        public ValueTask SetAsync(string storageType, string key, string value)
+        public async Task SetAsync(string storageType, string key, string value)
         {
-            return Runtime.InvokeVoidAsync($"{storageType}.setItem", key, value);
+            await Runtime.InvokeVoidAsync($"{storageType}.setItem", key, value);
         }
 
-        public ValueTask RemoveAsync(string storageType, string key)
+        public async Task RemoveAsync(string storageType, string key)
         {
-            return Runtime.InvokeVoidAsync($"{storageType}.removeItem", key);
+            await Runtime.InvokeVoidAsync($"{storageType}.removeItem", key);
         }
 
         [JSInvokable]

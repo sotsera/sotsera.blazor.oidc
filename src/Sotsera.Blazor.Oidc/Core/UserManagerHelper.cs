@@ -81,7 +81,7 @@ namespace Sotsera.Blazor.Oidc.Core
         {
             if (request.InteractionType.IsPopup())
             {
-                return Interop.OpenPopup(request).AsTask();
+                return Interop.OpenPopup(request);
             }
 
             UriHelper.NavigateTo(request.Url);
