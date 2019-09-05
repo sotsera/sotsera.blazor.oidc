@@ -27,12 +27,12 @@ namespace Sotsera.Blazor.Oidc.Core
     internal class UserManagerHelper: IUserManagerHelper
     {
         private IStore Store { get; }
-        private IUriHelper UriHelper { get; }
+        private NavigationManager UriHelper { get; }
         private Interop Interop { get; }
         private OidcHttpClient HttpClient { get; }
         private IOidcLogger<UserManagerHelper> Logger { get; }
 
-        public UserManagerHelper(IStore store, IUriHelper uriHelper, Interop interop,
+        public UserManagerHelper(IStore store, NavigationManager uriHelper, Interop interop,
             OidcHttpClient httpClient, IOidcLogger<UserManagerHelper> logger)
         {
             Store = store;
@@ -81,7 +81,7 @@ namespace Sotsera.Blazor.Oidc.Core
         {
             if (request.InteractionType.IsPopup())
             {
-                return Interop.OpenPopup(request);
+                return Interop.OpenPopup(request).AsTask();
             }
 
             UriHelper.NavigateTo(request.Url);

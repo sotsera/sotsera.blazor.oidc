@@ -3,6 +3,7 @@
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sotsera.Blazor.Oidc;
 using Sotsera.Blazor.Oidc.BrowserInterop;

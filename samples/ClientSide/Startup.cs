@@ -14,7 +14,8 @@ namespace ClientSide
         public void ConfigureServices(IServiceCollection services)
         {
             var issuerUri = new Uri("https://demo.identityserver.io");
-            var baseUri = new Uri(WebAssemblyUriHelper.Instance.GetBaseUri());
+            //var baseUri = new Uri(WebAssemblyNavigationManager .Instance.GetBaseUri());
+            var baseUri = new Uri("http://localhost:52310/");
 
             services.AddOidc(OidcSample.CodeWithShortLivedToken(new OidcSettings(issuerUri, baseUri)
             {

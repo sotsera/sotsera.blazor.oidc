@@ -41,13 +41,13 @@ namespace Sotsera.Blazor.Oidc.Core.Storage
             return HandleErrors(nameof(Set), () =>
             {
                 var stringValue = Json.Serialize(item, key);
-                return Interop.SetAsync(StorageType, FormatKey(key), stringValue);
+                return Interop.SetAsync(StorageType, FormatKey(key), stringValue).AsTask();
             });
         }
 
         public Task Remove(string key)
         {
-            return HandleErrors(nameof(Remove), () => Interop.RemoveAsync(StorageType, FormatKey(key)));
+            return HandleErrors(nameof(Remove), () => Interop.RemoveAsync(StorageType, FormatKey(key))).AsTask();
         }
 
         private string FormatKey(string key)

@@ -4,7 +4,7 @@
     Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 *@
 @page "/oidc/callbacks/logout-redirect"
-@inject Microsoft.AspNetCore.Components.IUriHelper UriHelper
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @inject IUserManager UserManager
 
 Validating logout...
@@ -12,7 +12,7 @@ Validating logout...
 @code {
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        await UserManager.CompleteLogoutAsync(UriHelper.GetAbsoluteUri());
-        UriHelper.NavigateTo("/");
+        await UserManager.CompleteLogoutAsync(NavigationManager.Uri);
+        NavigationManager.NavigateTo("/");
     }
 }
