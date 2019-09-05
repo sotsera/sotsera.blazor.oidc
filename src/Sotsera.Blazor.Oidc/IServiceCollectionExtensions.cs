@@ -49,19 +49,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<ILogoutRequestBuilder, LogoutRequestBuilder>();
             services.TryAddScoped<ILogoutResponseParser, LogoutResponseParser>();
             services.TryAddScoped<ILogoutClient, LogoutClient>();
+            services.TryAddScoped<IStorage, BrowserStorage>();
             services.TryAddScoped<IStore, Store>();
-
-            services.TryAddScoped<IStorage>(p =>
-            {
-                var settings = p.GetRequiredService<OidcSettings>();
-                
-                if (settings.StorageType.IsMemory())
-                    return new MemoryStorage();
-                
-                var interop = p.GetRequiredService<Interop>();
-                var logger = p.GetRequiredService<IOidcLogger<BrowserStorage>>();
-                return new BrowserStorage(settings, interop, logger);
-            });
 
             services.TryAddScoped(b =>
             {

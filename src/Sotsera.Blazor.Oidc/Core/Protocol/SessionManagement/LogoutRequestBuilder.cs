@@ -95,11 +95,6 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             HandleErrors(nameof(EnsureValidParameters), () =>
             {
                 if (parameters.EndSessionEndpoint.IsEmpty()) throw Logger.Exception("No End Session Endpoint passed");
-
-                if (Settings.StorageType.IsMemory() && parameters.InteractionType.IsRedirect())
-                {
-                    throw Logger.Exception("Interaction type cannot be redirect using memory storage");
-                }
             });
         }
 

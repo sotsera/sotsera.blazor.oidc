@@ -7,13 +7,11 @@ namespace Sotsera.Blazor.Oidc.Configuration.Model
     public enum StorageType
     {
         LocalStorage,
-        SessionStorage,
-        MemoryStorage
+        SessionStorage
     }
 
     internal static class StorageTypeExtensions
     {
-        public static bool IsMemory(this StorageType type) => type == StorageType.MemoryStorage;
         public static bool IsLocal(this StorageType type) => type == StorageType.LocalStorage;
         public static bool IsSession(this StorageType type) => type == StorageType.SessionStorage;
     }

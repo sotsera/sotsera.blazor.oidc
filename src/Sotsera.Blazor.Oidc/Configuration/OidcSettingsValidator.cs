@@ -37,16 +37,7 @@ namespace Sotsera.Blazor.Oidc.Configuration
             if (settings.ClientId.IsEmpty()) result.AddError("Missing client id");
             if (settings.ResponseType.IsEmpty()) result.AddError("Missing response type");
             if (settings.Scope.IsEmpty()) result.AddError("Missing scope");
-
-            if (settings.StorageType.IsMemory() && settings.InteractionType.IsRedirect())
-            {
-                result.AddError("Interaction type cannot be redirect using memory storage");
-            }
-
-            if (!settings.StorageType.IsMemory() && settings.StoragePrefix.IsEmpty())
-            {
-                result.AddError("Missing storage prefix");
-            }
+            if (settings.StoragePrefix.IsEmpty()) result.AddError("Missing storage prefix");
 
             return result;
         }
