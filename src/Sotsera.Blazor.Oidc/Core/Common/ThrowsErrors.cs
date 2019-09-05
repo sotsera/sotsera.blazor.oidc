@@ -51,7 +51,7 @@ namespace Sotsera.Blazor.Oidc.Core.Common
             }
         }
 
-        protected async Task HandleErrors(string methodName, Func<Task> func)
+        protected Task HandleErrors(string methodName, Func<Task> func)
         {
             Logger.LogTrace($"{ClassName}.{methodName}");
 
@@ -59,7 +59,7 @@ namespace Sotsera.Blazor.Oidc.Core.Common
             
             try
             {
-                await func();
+                return func();
             }
             catch (Exception ex)
             {
@@ -67,7 +67,7 @@ namespace Sotsera.Blazor.Oidc.Core.Common
             }
         }
 
-        protected async Task<TResult> HandleErrors<TResult>(string methodName, Func<Task<TResult>> func)
+        protected Task<TResult> HandleErrors<TResult>(string methodName, Func<Task<TResult>> func)
         {
             Logger.LogTrace($"{ClassName}.{methodName}");
 
@@ -75,7 +75,7 @@ namespace Sotsera.Blazor.Oidc.Core.Common
 
             try
             {
-                return await func();
+                return func();
             }
             catch (Exception ex)
             {
