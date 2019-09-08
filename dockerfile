@@ -16,7 +16,8 @@ RUN dotnet build samples/ClientSide/ClientSide.csproj -c Release
 FROM build AS publish
 RUN dotnet publish "samples/ClientSide/ClientSide.csproj" -c Release -o /publish
 
-FROM fholzer/nginx-brotli AS final
+#FROM fholzer/nginx-brotli AS final
+FROM nginx:alpine AS final
 WORKDIR /usr/share/nginx/html
 COPY --from=publish /publish/ClientSide/dist .
 COPY --from=publish /publish/wwwroot .
