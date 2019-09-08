@@ -13,10 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution", "_solution", "{
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		azure-pipelines-demo-site.yml = azure-pipelines-demo-site.yml
 		samples\ClientSide\wwwroot\CNAME = samples\ClientSide\wwwroot\CNAME
 		Directory.Build.props = Directory.Build.props
+		dockerfile = dockerfile
 		global.json = global.json
 		LICENSE.txt = LICENSE.txt
+		nginx.conf = nginx.conf
 		README.md = README.md
 	EndProjectSection
 EndProject
