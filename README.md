@@ -51,7 +51,7 @@ public void ConfigureServices(IServiceCollection services)
 Add the following reference to the oidc javascript in the __index.html__ file paying attention to match the library version:
 
 ```c#
-<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-3.js"></script>
+<script src="_content/Sotsera.Blazor.Oidc/sotsera.blazor.oidc-1.0.0-alpha-4.js"></script>
 ```
 
 ### Blazor Authorization 

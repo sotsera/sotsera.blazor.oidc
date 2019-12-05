@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <AspNetCoreVersion>3.0.0-preview9.19424.4</AspNetCoreVersion>
+    <BlazorVersion>3.1.0-preview4.19579.2</BlazorVersion>
+    <ComponentsVersion>3.1.0</ComponentsVersion>
     <Authors>Alessandro Ghidini</Authors>
     <Company></Company>
     <Copyright>Alessandro Ghidini</Copyright>

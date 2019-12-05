@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <IsPackable>true</IsPackable>
     <LangVersion>8.0</LangVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>Sotsera.Blazor.Oidc</AssemblyName>
     <RootNamespace>Sotsera.Blazor.Oidc</RootNamespace>
-    <Version>1.0.0-alpha-3</Version>
+    <Version>1.0.0-alpha-4</Version>
     <Description>OpenID Connect (OIDC) client for Blazor client-side or hosted projects</Description>
     <PackageProjectUrl>https://github.com/sotsera/sotsera.blazor.oidc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/sotsera/sotsera.blazor.oidc.git</RepositoryUrl>
@@ -17,10 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(ComponentsVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="$(BlazorVersion)" />
   </ItemGroup>
 
   <ItemGroup>
