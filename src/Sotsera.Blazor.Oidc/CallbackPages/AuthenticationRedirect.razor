@@ -14,6 +14,6 @@ Validating authentication...
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
         await UserManager.CompleteAuthenticationAsync(NavigationManager.Uri);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo(NavigationManager.BaseUri);
     }
 }
