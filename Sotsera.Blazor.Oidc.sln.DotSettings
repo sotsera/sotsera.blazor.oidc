@@ -3,4 +3,7 @@
 Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.&#xD;
 Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen &amp; Dominick Baier licensed under the Apache License, Version 2.0&#xD;
 &#xD;
-</s:String></wpf:ResourceDictionary>
+</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Blazor/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Oidc/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Sotsera/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

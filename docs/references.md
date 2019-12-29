@@ -21,4 +21,7 @@ The token exchange is performed accordingly to the The OAuth 2.0 Authorization F
 [JSON Web Algorithms (JWA)](https://tools.ietf.org/html/rfc7518)
 [The 'acct' URI Scheme](https://tools.ietf.org/html/rfc7565)
 
-https://auth0.com/docs/api-auth/tutorials/verify-access-token
+[Validate an Access Token](https://auth0.com/docs/api-auth/tutorials/verify-access-token)
+
+# .net core crypto
+[JWT Signing using RSASSA-PSS in .NET Core](https://www.scottbrady91.com/C-Sharp/JWT-Signing-using-RSASSA-PSS-in-dotnet-Core)

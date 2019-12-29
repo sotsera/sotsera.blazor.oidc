@@ -31,6 +31,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BCF07DD8-1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sotsera.Blazor.Oidc", "src\Sotsera.Blazor.Oidc\Sotsera.Blazor.Oidc.csproj", "{9E26D0C3-D09E-4C1E-8838-9D90E118AAE9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2556517F-DB75-461B-80E6-FC2EF119C271}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sotsera.Blazor.Oidc.Tests", "test\Sotsera.Blazor.Oidc.Tests\Sotsera.Blazor.Oidc.Tests.csproj", "{6B7FA092-E78D-45FA-978C-8F5D758C53A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,10 @@ Global
 		{9E26D0C3-D09E-4C1E-8838-9D90E118AAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E26D0C3-D09E-4C1E-8838-9D90E118AAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E26D0C3-D09E-4C1E-8838-9D90E118AAE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B7FA092-E78D-45FA-978C-8F5D758C53A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B7FA092-E78D-45FA-978C-8F5D758C53A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B7FA092-E78D-45FA-978C-8F5D758C53A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B7FA092-E78D-45FA-978C-8F5D758C53A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +60,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{46F7C045-B291-47B8-96B6-A355B70ABF5A} = {5FF64798-3FA7-416A-B18E-2FA3C877D8C7}
 		{9E26D0C3-D09E-4C1E-8838-9D90E118AAE9} = {2D97C11E-FE45-4E37-BC84-8DD3364EA241}
+		{6B7FA092-E78D-45FA-978C-8F5D758C53A8} = {2556517F-DB75-461B-80E6-FC2EF119C271}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A687FE11-78AA-452C-BE25-9725A477B0B9}
