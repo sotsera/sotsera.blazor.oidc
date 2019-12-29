@@ -20,6 +20,7 @@ namespace Sotsera.Blazor.Oidc.Core
         private bool Initialized { get; set; }
         private bool SessionIsValid { get; set; }
         private IOidcLogger<UserManager> Logger { get; }
+        private OidcSettings Settings { get; }
         private IOidcClient OidcClient { get; }
         private ILogoutClient LogoutClient { get; }
         private ISessionMonitor Monitor { get; }
@@ -33,10 +34,11 @@ namespace Sotsera.Blazor.Oidc.Core
         public event Action<string> OnError;
 
         public UserManager(
-            IOidcClient oidcClient, ILogoutClient logoutClient, ISessionMonitor monitor,
+            OidcSettings settings, IOidcClient oidcClient, ILogoutClient logoutClient, ISessionMonitor monitor,
             IUserManagerHelper helper, IOidcLogger<UserManager> logger
         )
         {
+            Settings = settings;
             OidcClient = oidcClient;
             LogoutClient = logoutClient;
             Monitor = monitor;
@@ -44,7 +46,7 @@ namespace Sotsera.Blazor.Oidc.Core
             Logger = logger;
 
             Version = GetType().InformationalVersion();
-            Monitor.OnSessionChanged += SessionChanged;
+            if (Settings.MonitorSession) Monitor.OnSessionChanged += SessionChanged;
         }
 
         public Task InitAsync(bool skipInitialStateValidation = false)
@@ -60,9 +62,15 @@ namespace Sotsera.Blazor.Oidc.Core
                     var userState = await Helper.UserState();
                     if (userState != null)
                     {
-                        var sessionState = await Monitor.CheckSession(userState);
-
-                        if (sessionState.IsValid) await UpdateUserState(userState, false, false);
+                        if (Settings.MonitorSession)
+                        {
+                            var sessionState = await Monitor.CheckSession(userState);
+                            if (sessionState.IsValid) await UpdateUserState(userState, false, false);
+                        }
+                        else
+                        {
+                            await UpdateUserState(userState, false, false);
+                        }
 
                         //await SilentLoginAsync(false);
                     }
@@ -157,13 +165,13 @@ namespace Sotsera.Blazor.Oidc.Core
             if (UserState == null)
             {
                 SessionIsValid = false;
-                Monitor.Stop();
+                if (Settings.MonitorSession) Monitor.Stop();
                 if (updateStore) await Helper.ClearUserState();
             }
             else
             {
                 SessionIsValid = true;
-                await Monitor.Start(UserState);
+                if(Settings.MonitorSession) await Monitor.Start(UserState);
                 if (updateStore) await Helper.SetUserState(userState);
             }
 

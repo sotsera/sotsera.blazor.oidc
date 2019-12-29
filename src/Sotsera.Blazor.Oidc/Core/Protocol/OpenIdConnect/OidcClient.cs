@@ -73,7 +73,8 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
 
                 if (state.IsCodeFlow)
                 {
-                    response.Merge(await RequestToken(response, state));
+                    var codeToken = await RequestToken(response, state);
+                    response.Merge(codeToken);
                 }
 
                 var token = await ResponseParser.ParseResponse(response, state);

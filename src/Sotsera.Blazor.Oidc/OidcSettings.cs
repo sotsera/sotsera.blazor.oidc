@@ -62,7 +62,8 @@ namespace Sotsera.Blazor.Oidc
         public bool RevokeAccessTokenOnSignout { get; set; } = false;
 
         // Session Monitor
-        
+
+        public bool MonitorSession { get; set; } = true;
         public int CheckSessionInterval { get; set; } = 2000;
         public bool CheckSessionStopOnError { get; set; } = true;
         
@@ -74,7 +75,7 @@ namespace Sotsera.Blazor.Oidc
         #region Metadata
 
         public string MetadataEndpoint { get; set; }
-        public OpenidEndpoints Endpoints { get; set; }
+        public OpenidEndpoints Endpoints { get; set; } = new OpenidEndpoints();
         public Jwks Jwks { get; set; }
 
         #endregion
