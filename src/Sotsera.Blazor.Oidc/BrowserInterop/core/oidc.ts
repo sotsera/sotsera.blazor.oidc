@@ -55,12 +55,13 @@ export default class Oidc {
 
     private popupCallback = async (callbackName: string): Promise<void> => {
         const popup = this.popup;
+        const popupInteractionType = 1;
 
         if (this.interop === undefined) return Promise.reject("Oidc Interop service not initialized");
         if (popup === undefined || popup === null) return Promise.reject("Invalid popup handler");
 
         return await this.interop
-            .invokeMethodAsync<void>(callbackName, popup.url)
+            .invokeMethodAsync<void>(callbackName, popup.url, popupInteractionType)
             .then(() => popup.close());
     }
 }

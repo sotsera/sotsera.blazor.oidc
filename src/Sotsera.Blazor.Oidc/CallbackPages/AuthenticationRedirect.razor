@@ -4,6 +4,7 @@
     Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 *@
 @page "/oidc/callbacks/authentication-redirect"
+@using Sotsera.Blazor.Oidc.Configuration.Model
 @inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
 @inject IUserManager UserManager
 @layout EmptyLayout
@@ -13,7 +14,7 @@ Validating authentication...
 @code {
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
-        await UserManager.CompleteAuthenticationAsync(NavigationManager.Uri);
-        NavigationManager.NavigateTo(NavigationManager.BaseUri);
+        await UserManager.CompleteAuthenticationAsync(NavigationManager.Uri, InteractionType.Redirect);
+        //NavigationManager.NavigateTo(NavigationManager.BaseUri);
     }
 }

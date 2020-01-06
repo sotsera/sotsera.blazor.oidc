@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Sotsera.Blazor.Oidc.Configuration.Model;
@@ -152,7 +153,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 Issuer = parameters.Issuer,
                 ClientId = parameters.ClientId,
                 ResponseType = parameters.ResponseType,
-                State = crypto.CreateUniqueHexadecimal(32),
+                State = Base64Url.Serialize(CreateOidcRequestState(crypto, parameters.StateData), "oidc authentication request state") ,
                 RedirectUri = parameters.RedirectUri,
                 ResponseMode = parameters.ResponseMode
             };
@@ -171,6 +172,15 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             }
 
             return state;
+        }
+
+        private OidcRequestState CreateOidcRequestState(Crypto crypto, NameValueCollection stateData)
+        {
+            return new OidcRequestState
+            {
+                Id = crypto.CreateUniqueHexadecimal(32), 
+                Data = stateData.Count > 0 ? stateData : null
+            };
         }
 
         private async Task<AuthParameters> BuildParameters()
@@ -194,6 +204,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 UiLocales = Settings.UiLocales,
                 AcrValues = Settings.AcrValues,
                 AdditionalParameters = Settings.AdditionalParameters ?? new NameValueCollection(),
+                StateData = Settings.AuthenticationStateData ?? new NameValueCollection(),
 
                 PopupWindowName = Settings.PopupWindowName,
                 PopupWindowFeatures = Settings.PopupWindowFeatures,

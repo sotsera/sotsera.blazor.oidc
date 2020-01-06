@@ -4,9 +4,14 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sotsera.Blazor.Oidc.Configuration.Model;
+using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery.Model;
+using Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model;
 
 namespace Sotsera.Blazor.Oidc
 {
@@ -27,9 +32,11 @@ namespace Sotsera.Blazor.Oidc
         public string ResponseMode { get; set; }
         public string Resource { get; set; }
         public NameValueCollection AdditionalParameters { get; } = new NameValueCollection();
+        public NameValueCollection AuthenticationStateData { get; } = new NameValueCollection();
+        public NameValueCollection LogoutStateData { get; } = new NameValueCollection();
 
         #endregion
-        
+
         #region Behaviour
 
         // Protocol
@@ -90,6 +97,15 @@ namespace Sotsera.Blazor.Oidc
 
         #endregion
 
+        #region actions
+
+        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostAuthenticationRedirect;
+        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostAuthenticationPopup;
+        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostLogoutRedirect;
+        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostLogoutPopup;
+
+        #endregion
+
         public OidcSettings(Uri issuer)
         {
             if (issuer == null) throw new ArgumentNullException(nameof(issuer));
@@ -116,6 +132,33 @@ namespace Sotsera.Blazor.Oidc
             settings.SilentRenewCallbackUri = $"{baseCallbackUri}{pagePath}silent-renew.html";
 
             return settings;
+        }
+
+        public static OidcSettings UseDefaultActions(this OidcSettings settings, IServiceProvider serviceProvider)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
+
+            settings.PostAuthenticationRedirect = (user, state, provider) => RedirectToRoot(provider, nameof(OidcSettings.PostAuthenticationRedirect));
+            settings.PostAuthenticationPopup = (user, state, provider) => DoNothing(provider, nameof(OidcSettings.PostAuthenticationPopup));
+            settings.PostLogoutRedirect = (user, state, provider) => RedirectToRoot(provider, nameof(OidcSettings.PostLogoutRedirect));
+            settings.PostLogoutPopup = (user, state, provider) => DoNothing(provider, nameof(OidcSettings.PostLogoutPopup));
+
+            return settings;
+        }
+
+        public static Task RedirectToRoot(IServiceProvider serviceProvider, string actionName)
+        {
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Default {actionName} action: redirect to root");
+            navigationManager.NavigateTo(navigationManager.BaseUri);
+            return Task.CompletedTask;
+        }
+
+        public static Task DoNothing(IServiceProvider serviceProvider, string actionName)
+        {
+            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Default {actionName} action: do nothing");
+            return Task.CompletedTask;
         }
     }
 }

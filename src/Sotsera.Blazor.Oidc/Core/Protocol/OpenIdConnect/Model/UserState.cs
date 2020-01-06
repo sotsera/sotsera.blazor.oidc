@@ -3,6 +3,8 @@
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
 using System;
+using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
+using Sotsera.Blazor.Oidc.Utilities;
 
 namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
 {
@@ -17,6 +19,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
         public string TokenType { get; set; }
         public OidcUser User { get; set; }
 
+        public OidcRequestState OidcRequestState => Base64Url.Deserialize<OidcRequestState>(State, "oidc authentication request state");
         //public bool Expired => ExpiresAt <= DateTime.Now;
     }
 }

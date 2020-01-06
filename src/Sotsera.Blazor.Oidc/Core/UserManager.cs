@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Common;
@@ -17,6 +18,7 @@ namespace Sotsera.Blazor.Oidc.Core
 {
     internal class UserManager : IUserManager, IDisposable
     {
+        private IServiceProvider ServiceProvider { get; }
         private bool Initialized { get; set; }
         private bool SessionIsValid { get; set; }
         private IOidcLogger<UserManager> Logger { get; }
@@ -33,17 +35,15 @@ namespace Sotsera.Blazor.Oidc.Core
         public event Action<UserSessionExpiringArgs> OnUserSessionExpiring;
         public event Action<string> OnError;
 
-        public UserManager(
-            OidcSettings settings, IOidcClient oidcClient, ILogoutClient logoutClient, ISessionMonitor monitor,
-            IUserManagerHelper helper, IOidcLogger<UserManager> logger
-        )
+        public UserManager(IServiceProvider serviceProvider)
         {
-            Settings = settings;
-            OidcClient = oidcClient;
-            LogoutClient = logoutClient;
-            Monitor = monitor;
-            Helper = helper;
-            Logger = logger;
+            ServiceProvider = serviceProvider;
+            Settings = serviceProvider.GetRequiredService<OidcSettings>();
+            OidcClient = serviceProvider.GetRequiredService<IOidcClient>();
+            LogoutClient = serviceProvider.GetRequiredService<ILogoutClient>();
+            Monitor = serviceProvider.GetRequiredService<ISessionMonitor>();
+            Helper = serviceProvider.GetRequiredService<IUserManagerHelper>();
+            Logger = serviceProvider.GetRequiredService<IOidcLogger<UserManager>>();
 
             Version = GetType().InformationalVersion();
             if (Settings.MonitorSession) Monitor.OnSessionChanged += SessionChanged;
@@ -101,7 +101,7 @@ namespace Sotsera.Blazor.Oidc.Core
             });
         }
 
-        public Task CompleteAuthenticationAsync(string url)
+        public Task CompleteAuthenticationAsync(string url, InteractionType interactionType)
         {
             return HandleErrors(nameof(CompleteAuthenticationAsync), async () =>
             {
@@ -110,6 +110,21 @@ namespace Sotsera.Blazor.Oidc.Core
                 var userState = await OidcClient.ParseResponse(url);
 
                 await UpdateUserState(userState, true, true);
+
+                if (interactionType == InteractionType.Popup)
+                {
+                    if (Settings.PostAuthenticationPopup != null)
+                    {
+                        await Settings.PostAuthenticationPopup(userState.User, userState.OidcRequestState.Data, ServiceProvider);
+                    }
+                }
+                else
+                {
+                    if (Settings.PostAuthenticationRedirect != null)
+                    {
+                        await Settings.PostAuthenticationRedirect(userState.User, userState.OidcRequestState.Data, ServiceProvider);
+                    }
+                }
             });
         }
 
@@ -134,12 +149,27 @@ namespace Sotsera.Blazor.Oidc.Core
             });
         }
 
-        public Task CompleteLogoutAsync(string url)
+        public Task CompleteLogoutAsync(string url, InteractionType interactionType)
         {
             return HandleErrors(nameof(CompleteLogoutAsync), async () =>
             {
                 await InitAsync(true); //Needed for redirect callback
-                await LogoutClient.ParseResponse(url);
+                var requestState = await LogoutClient.ParseResponse(url);
+
+                if (interactionType == InteractionType.Popup)
+                {
+                    if (Settings.PostAuthenticationPopup != null)
+                    {
+                        await Settings.PostLogoutPopup(User, requestState.Data, ServiceProvider);
+                    }
+                }
+                else
+                {
+                    if (Settings.PostAuthenticationRedirect != null)
+                    {
+                        await Settings.PostLogoutRedirect(User, requestState.Data, ServiceProvider);
+                    }
+                }
             });
         }
 

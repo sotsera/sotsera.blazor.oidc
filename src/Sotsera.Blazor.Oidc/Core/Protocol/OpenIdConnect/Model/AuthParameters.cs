@@ -30,6 +30,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
         public string RequestUri { get; set; }
         public TimeSpan OpenPopupTimeout { get; set; }
         public NameValueCollection AdditionalParameters { get; internal set; }
+        public NameValueCollection StateData { get; internal set; }
 
         public bool RequiresNonce => ResponseType.IsNotEmpty() && ResponseType.StartsWith("id_token");
         public bool RequiresCodeVerifier => ResponseType == "code";

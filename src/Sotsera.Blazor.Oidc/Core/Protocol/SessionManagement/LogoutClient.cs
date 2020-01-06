@@ -17,7 +17,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
     {
         Task<LogoutRequest> CreateLogoutRequest(string idToken, Action<LogoutParameters> configureParameters);
         OidcRequest CreateBrowserRequest(LogoutRequest request);
-        Task ParseResponse(string url);
+        Task<OidcRequestState> ParseResponse(string url);
     }
 
     internal class LogoutClient: ThrowsErrors<LogoutClient>, ILogoutClient
@@ -63,7 +63,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             return HandleErrors(nameof(CreateBrowserRequest), () => RequestBuilder.CreateBrowserRequest(request));
         }
 
-        public Task ParseResponse(string url)
+        public Task<OidcRequestState> ParseResponse(string url)
         {
             return HandleErrors(nameof(ParseResponse), async () =>
             {
@@ -74,6 +74,8 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
                 ResponseParser.EnsureValidState(response, state);
                 
                 await Store.RemoveLogoutState();
+
+                return state.OidcRequestState;
             });
         }
     }

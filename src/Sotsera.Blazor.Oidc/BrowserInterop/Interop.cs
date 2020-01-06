@@ -5,6 +5,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model;
@@ -58,9 +59,15 @@ namespace Sotsera.Blazor.Oidc.BrowserInterop
         }
 
         [JSInvokable]
-        public Task CompleteAuthenticationAsync(string url) => UserManager.CompleteAuthenticationAsync(url);
+        public Task CompleteAuthenticationAsync(string url, InteractionType interactionType)
+        {
+            return UserManager.CompleteAuthenticationAsync(url, interactionType);
+        }
 
         [JSInvokable]
-        public Task CompleteLogoutAsync(string url) => UserManager.CompleteLogoutAsync(url);
+        public Task CompleteLogoutAsync(string url, InteractionType interactionType)
+        {
+            return UserManager.CompleteLogoutAsync(url, interactionType);
+        }
     }
 }

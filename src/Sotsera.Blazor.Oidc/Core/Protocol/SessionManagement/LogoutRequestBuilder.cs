@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
-using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Common;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery;
@@ -49,8 +48,12 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
         {
             return HandleErrors(nameof(CreateLogoutRequest), () =>
             {
-                var state = new LogoutState { State = new Crypto().CreateUniqueHexadecimal(32) };
-                var url = BuildAuthenticationUrl(parameters, state);
+                var requestState = CreateOidcRequestState(new Crypto(), parameters.StateData);
+                var state = new LogoutState
+                {
+                    State = Base64Url.Serialize(requestState, "oidc logout request state")
+                };
+                var url = BuildLogoutUrl(parameters, state);
 
                 return new LogoutRequest {Url = url, State = state, Parameters = parameters};
             });
@@ -66,6 +69,15 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
                 WindowName = request.Parameters.PopupWindowName,
                 WindowFeatures = request.Parameters.PopupWindowFeatures
             });
+        }
+
+        private OidcRequestState CreateOidcRequestState(Crypto crypto, NameValueCollection stateData)
+        {
+            return new OidcRequestState
+            {
+                Id = crypto.CreateUniqueHexadecimal(32), 
+                Data = stateData.Count > 0 ? stateData : null
+            };
         }
 
         private async Task<LogoutParameters> BuildParameters(string idToken)
@@ -86,7 +98,8 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
 
                 RedirectCallbackUri = Settings.LogoutRedirectCallbackUri,
                 PopupCallbackUri = Settings.LogoutPopupCallbackUri,
-                AdditionalParameters = Settings.AdditionalParameters ?? new NameValueCollection()
+                AdditionalParameters = Settings.AdditionalParameters ?? new NameValueCollection(),
+                StateData = Settings.LogoutStateData ?? new NameValueCollection()
             };
         }
 
@@ -98,7 +111,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             });
         }
 
-        private string BuildAuthenticationUrl(LogoutParameters parameters, LogoutState state)
+        private string BuildLogoutUrl(LogoutParameters parameters, LogoutState state)
         {
             return new UrlBuilder(parameters.EndSessionEndpoint)
                 .Add("post_logout_redirect_uri", parameters.RedirectUri)

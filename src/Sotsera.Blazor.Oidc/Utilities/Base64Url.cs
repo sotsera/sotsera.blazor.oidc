@@ -15,6 +15,20 @@ internal static class Base64Url
             return SerializeBytes(Encoding.UTF8.GetBytes(value), subject);
         }
 
+        public static string Serialize<T>(T value, string subject)
+        {
+            try
+            {
+                if (value == null) return default;
+                var json = Json.Serialize(value, subject);
+                return Serialize(json, subject);
+            }
+            catch (Exception ex)
+            {
+                throw new OidcException($"Error serializing the Base64Url {subject}: {ex.Message}");
+            }
+        }
+
         public static string SerializeBytes(byte[] bytes, string subject)
         {
             try
@@ -41,7 +55,7 @@ internal static class Base64Url
             }
             catch (Exception ex)
             {
-                throw new OidcException($"Error deserializing the Base64 {subject}: {ex.Message}");
+                throw new OidcException($"Error deserializing the Base64Url {subject}: {ex.Message}");
             }
         }
 
@@ -73,7 +87,7 @@ internal static class Base64Url
             }
             catch (Exception ex)
             {
-                throw new OidcException($"Error deserializing the Base64 {subject}: {ex.Message}");
+                throw new OidcException($"Error deserializing the Base64Url {subject}: {ex.Message}");
             }
         }
 
@@ -87,7 +101,7 @@ internal static class Base64Url
             }
             catch (Exception ex)
             {
-                throw new OidcException($"Error deserializing the Base64 {subject}: {ex.Message}");
+                throw new OidcException($"Error deserializing the Base64Url {subject}: {ex.Message}");
             }
         }
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model;
 
@@ -25,7 +26,7 @@ namespace Sotsera.Blazor.Oidc
 
         Task BeginAuthenticationAsync(Action<AuthParameters> configureParameters = null);
         Task BeginLogoutAsync(Action<LogoutParameters> configureParameters= null);
-        Task CompleteAuthenticationAsync(string url);
-        Task CompleteLogoutAsync(string url);
+        Task CompleteAuthenticationAsync(string url, InteractionType interactionType);
+        Task CompleteLogoutAsync(string url, InteractionType interactionType);
     }
 }

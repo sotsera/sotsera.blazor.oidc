@@ -12,8 +12,10 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model
     {
         public string EndSessionEndpoint { get; set; }
         public string IdTokenHint { get; set; }
-        public NameValueCollection AdditionalParameters { get; internal set; }
         public TimeSpan OpenPopupTimeout { get; set; }
         public bool RevokeAccessTokenOnSignout { get; set; }
+
+        public NameValueCollection AdditionalParameters { get; internal set; }
+        public NameValueCollection StateData { get; internal set; }
     }
 }

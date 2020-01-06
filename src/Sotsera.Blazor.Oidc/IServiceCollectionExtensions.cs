@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sotsera.Blazor.Oidc;
 using Sotsera.Blazor.Oidc.BrowserInterop;
 using Sotsera.Blazor.Oidc.Configuration;
-using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery.Model;
@@ -56,6 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var navigationManager = b.GetRequiredService<NavigationManager>();
                 var settings = new OidcSettings(issuer);
+                settings.UseDefaultActions(b.GetRequiredService<IServiceProvider>());
                 configure?.Invoke(settings, new Uri(navigationManager.BaseUri));
                 new OidcSettingsValidator().EnsureValidSettings(services, settings);
                 return settings;
