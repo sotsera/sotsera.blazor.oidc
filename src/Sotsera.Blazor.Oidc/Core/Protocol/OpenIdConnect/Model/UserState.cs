@@ -20,6 +20,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
         public OidcUser User { get; set; }
 
         public OidcRequestState OidcRequestState => Base64Url.Deserialize<OidcRequestState>(State, "oidc authentication request state");
+
         //public bool Expired => ExpiresAt <= DateTime.Now;
     }
 }

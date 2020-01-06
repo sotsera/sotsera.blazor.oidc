@@ -3,8 +3,10 @@
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Sotsera.Blazor.Oidc.Core.Common;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery;
@@ -23,13 +25,15 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
     internal class LogoutRequestBuilder: ThrowsErrors<LogoutRequestBuilder>,  ILogoutRequestBuilder
     {
         private OidcSettings Settings { get; }
+        private IServiceProvider ServiceProvider { get; }
         private IMetadataService Metadata { get; }
         protected override IOidcLogger<LogoutRequestBuilder> Logger { get; }
 
-        public LogoutRequestBuilder(OidcSettings settings, IMetadataService metadata, IOidcLogger<LogoutRequestBuilder> logger)
+        public LogoutRequestBuilder(OidcSettings settings, IServiceProvider serviceProvider, IOidcLogger<LogoutRequestBuilder> logger)
         {
             Settings = settings;
-            Metadata = metadata;
+            ServiceProvider = serviceProvider;
+            Metadata = serviceProvider.GetRequiredService<IMetadataService>();
             Logger = logger;
         }
 
@@ -38,6 +42,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             return HandleErrors(nameof(CreateLogoutParameters), async () =>
             {
                 var parameters = await BuildParameters(idToken);
+                Settings.PreLogout?.Invoke(parameters, ServiceProvider);
                 configureParameters?.Invoke(parameters);
                 EnsureValidParameters(parameters);
                 return parameters;
@@ -71,12 +76,12 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
             });
         }
 
-        private OidcRequestState CreateOidcRequestState(Crypto crypto, NameValueCollection stateData)
+        private OidcRequestState CreateOidcRequestState(Crypto crypto, Dictionary<string, string> stateData)
         {
             return new OidcRequestState
             {
                 Id = crypto.CreateUniqueHexadecimal(32), 
-                Data = stateData.Count > 0 ? stateData : null
+                Data = stateData.Keys.Count > 0 ? stateData : null
             };
         }
 
@@ -99,7 +104,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement
                 RedirectCallbackUri = Settings.LogoutRedirectCallbackUri,
                 PopupCallbackUri = Settings.LogoutPopupCallbackUri,
                 AdditionalParameters = Settings.AdditionalParameters ?? new NameValueCollection(),
-                StateData = Settings.LogoutStateData ?? new NameValueCollection()
+                StateData = Settings.LogoutStateData ?? new Dictionary<string, string>()
             };
         }
 

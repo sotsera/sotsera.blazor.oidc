@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Common;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
@@ -31,13 +32,15 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
     internal class AuthRequestBuilder: ThrowsErrors<AuthRequestBuilder>, IAuthRequestBuilder
     {
         private OidcSettings Settings { get; }
+        private IServiceProvider ServiceProvider { get; }
         private IMetadataService Metadata { get; }
         protected override IOidcLogger<AuthRequestBuilder> Logger { get; }
 
-        public AuthRequestBuilder(OidcSettings settings, IMetadataService metadata, IOidcLogger<AuthRequestBuilder> logger)
+        public AuthRequestBuilder(OidcSettings settings, IServiceProvider serviceProvider, IOidcLogger<AuthRequestBuilder> logger)
         {
             Settings = settings;
-            Metadata = metadata;
+            ServiceProvider = serviceProvider;
+            Metadata = serviceProvider.GetRequiredService<IMetadataService>();
             Logger = logger;
         }
 
@@ -46,6 +49,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             return HandleErrors(nameof(CreateAuthParameters), async () =>
             {
                 var parameters = await BuildParameters();
+                Settings.PreAuthentication?.Invoke(parameters, ServiceProvider);
                 configureParameters?.Invoke(parameters);
                 EnsureValidParameters(parameters);
                 return parameters;
@@ -56,7 +60,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
         {
             HandleErrors(nameof(EnsureValidParameters), () =>
             {
-                var validResopnseTypes = Consts.Oidc.ValidResponseTypes;
+                var validResponseTypes = Consts.Oidc.ValidResponseTypes;
 
                 if (parameters.AuthorizationEndpoint.IsEmpty()) throw Logger.Exception("No Authorization Endpoint passed");
                 if (parameters.ClientId.IsEmpty()) throw Logger.Exception("No ClientId passed");
@@ -65,9 +69,9 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 if (parameters.Scope.IsEmpty()) throw Logger.Exception("No Scope passed");
                 if (parameters.Issuer.IsEmpty()) throw Logger.Exception("No Issuer passed");
 
-                if (!validResopnseTypes.Any(x => x.Equals(parameters.ResponseType)))
+                if (!validResponseTypes.Any(x => x.Equals(parameters.ResponseType)))
                 {
-                    throw Logger.Exception("Response type must be " + string.Join(" OR ", validResopnseTypes));
+                    throw Logger.Exception("Response type must be " + string.Join(" OR ", validResponseTypes));
                 }
             });
         }
@@ -153,7 +157,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 Issuer = parameters.Issuer,
                 ClientId = parameters.ClientId,
                 ResponseType = parameters.ResponseType,
-                State = Base64Url.Serialize(CreateOidcRequestState(crypto, parameters.StateData), "oidc authentication request state") ,
+                State = Base64Url.Serialize(CreateOidcRequestState(crypto, parameters), "oidc authentication request state") ,
                 RedirectUri = parameters.RedirectUri,
                 ResponseMode = parameters.ResponseMode
             };
@@ -174,12 +178,12 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
             return state;
         }
 
-        private OidcRequestState CreateOidcRequestState(Crypto crypto, NameValueCollection stateData)
+        private OidcRequestState CreateOidcRequestState(Crypto crypto, AuthParameters parameters)
         {
             return new OidcRequestState
             {
                 Id = crypto.CreateUniqueHexadecimal(32), 
-                Data = stateData.Count > 0 ? stateData : null
+                Data = parameters.StateData !=null && parameters.StateData.Count > 0 ? parameters.StateData : null
             };
         }
 
@@ -204,7 +208,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect
                 UiLocales = Settings.UiLocales,
                 AcrValues = Settings.AcrValues,
                 AdditionalParameters = Settings.AdditionalParameters ?? new NameValueCollection(),
-                StateData = Settings.AuthenticationStateData ?? new NameValueCollection(),
+                StateData = Settings.AuthenticationStateData ?? new Dictionary<string, string>(),
 
                 PopupWindowName = Settings.PopupWindowName,
                 PopupWindowFeatures = Settings.PopupWindowFeatures,

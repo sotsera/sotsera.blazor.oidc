@@ -3,6 +3,7 @@
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
@@ -30,7 +31,7 @@ namespace Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model
         public string RequestUri { get; set; }
         public TimeSpan OpenPopupTimeout { get; set; }
         public NameValueCollection AdditionalParameters { get; internal set; }
-        public NameValueCollection StateData { get; internal set; }
+        public Dictionary<string, string> StateData { get; internal set; }
 
         public bool RequiresNonce => ResponseType.IsNotEmpty() && ResponseType.StartsWith("id_token");
         public bool RequiresCodeVerifier => ResponseType == "code";

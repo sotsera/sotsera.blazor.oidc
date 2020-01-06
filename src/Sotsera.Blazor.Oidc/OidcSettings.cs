@@ -3,6 +3,7 @@
 // Based on https://github.com/IdentityModel/oidc-client-js by Brock Allen & Dominick Baier licensed under the Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,8 @@ using Sotsera.Blazor.Oidc.Configuration.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Common.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.Discovery.Model;
 using Sotsera.Blazor.Oidc.Core.Protocol.OpenIdConnect.Model;
+using Sotsera.Blazor.Oidc.Core.Protocol.SessionManagement.Model;
+using Sotsera.Blazor.Oidc.Utilities;
 
 namespace Sotsera.Blazor.Oidc
 {
@@ -32,8 +35,8 @@ namespace Sotsera.Blazor.Oidc
         public string ResponseMode { get; set; }
         public string Resource { get; set; }
         public NameValueCollection AdditionalParameters { get; } = new NameValueCollection();
-        public NameValueCollection AuthenticationStateData { get; } = new NameValueCollection();
-        public NameValueCollection LogoutStateData { get; } = new NameValueCollection();
+        public Dictionary<string, string> AuthenticationStateData { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> LogoutStateData { get; } = new Dictionary<string, string>();
 
         #endregion
 
@@ -99,10 +102,13 @@ namespace Sotsera.Blazor.Oidc
 
         #region actions
 
-        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostAuthenticationRedirect;
-        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostAuthenticationPopup;
-        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostLogoutRedirect;
-        public Func<OidcUser, NameValueCollection, IServiceProvider, Task> PostLogoutPopup;
+        public Func<AuthParameters, IServiceProvider, Task> PreAuthentication;
+        public Func<LogoutParameters, IServiceProvider, Task> PreLogout;
+
+        public Func<OidcUser, Dictionary<string, string>, IServiceProvider, Task> PostAuthenticationRedirect;
+        public Func<OidcUser, Dictionary<string, string>, IServiceProvider, Task> PostAuthenticationPopup;
+        public Func<OidcUser, Dictionary<string, string>, IServiceProvider, Task> PostLogoutRedirect;
+        public Func<OidcUser, Dictionary<string, string>, IServiceProvider, Task> PostLogoutPopup;
 
         #endregion
 
@@ -134,30 +140,80 @@ namespace Sotsera.Blazor.Oidc
             return settings;
         }
 
-        public static OidcSettings UseDefaultActions(this OidcSettings settings, IServiceProvider serviceProvider)
+        public static OidcSettings UseDefaultActions(this OidcSettings settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
-            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
 
-            settings.PostAuthenticationRedirect = (user, state, provider) => RedirectToRoot(provider, nameof(OidcSettings.PostAuthenticationRedirect));
-            settings.PostAuthenticationPopup = (user, state, provider) => DoNothing(provider, nameof(OidcSettings.PostAuthenticationPopup));
-            settings.PostLogoutRedirect = (user, state, provider) => RedirectToRoot(provider, nameof(OidcSettings.PostLogoutRedirect));
-            settings.PostLogoutPopup = (user, state, provider) => DoNothing(provider, nameof(OidcSettings.PostLogoutPopup));
+            settings.PreAuthentication = (parameters, provider) => DoNothing(provider);
+            settings.PreLogout = (parameters, provider) => DoNothing(provider);
+
+            settings.PostAuthenticationRedirect = (user, state, provider) => NavigateToRoot(provider);
+            settings.PostAuthenticationPopup = (user, state, provider) => DoNothing(provider);
+            settings.PostLogoutRedirect = (user, state, provider) => NavigateToRoot(provider);
+            settings.PostLogoutPopup = (user, state, provider) => DoNothing(provider);
 
             return settings;
         }
 
-        public static Task RedirectToRoot(IServiceProvider serviceProvider, string actionName)
+        public static OidcSettings UseRedirectToCallerActionsForAuthenticationRedirect(this OidcSettings settings)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
+            settings.PreAuthentication = (parameters, serviceProvider) => RegisterCurrentPage(parameters.StateData, serviceProvider);
+            settings.PostAuthenticationRedirect = (user, stateData, serviceProvider) => NavigateToCallerPage(stateData, serviceProvider);
+            return settings;
+        }
+
+        public static OidcSettings UseRedirectToCallerActionsForLogoutRedirect(this OidcSettings settings)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
+            settings.PreLogout = (parameters, serviceProvider) => RegisterCurrentPage(parameters.StateData, serviceProvider);
+            settings.PostLogoutRedirect = (user, stateData, serviceProvider) => NavigateToCallerPage(stateData, serviceProvider);
+            return settings;
+        }
+
+        public static Task NavigateToRoot(IServiceProvider serviceProvider)
         {
             var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
-            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Default {actionName} action: redirect to root");
+            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Action {nameof(NavigateToRoot)}");
             navigationManager.NavigateTo(navigationManager.BaseUri);
             return Task.CompletedTask;
         }
 
-        public static Task DoNothing(IServiceProvider serviceProvider, string actionName)
+        public static Task NavigateToCallerPage(Dictionary<string, string> stateData, IServiceProvider serviceProvider)
         {
-            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Default {actionName} action: do nothing");
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            var logger = serviceProvider.GetRequiredService<ILogger<OidcSettings>>();
+
+            var redirectPage = stateData?["redirectPage"];
+
+            if (string.IsNullOrWhiteSpace(redirectPage))
+            {
+                logger.LogWarning($"Action {nameof(NavigateToCallerPage)}: redirectPage url is missing. Fallback to root.");
+                NavigateToRoot(serviceProvider);
+                return Task.CompletedTask;
+            }
+
+            logger.LogInformation($"Action {nameof(NavigateToCallerPage)}: navigate to {redirectPage}");
+            navigationManager.NavigateTo(redirectPage);
+            return Task.CompletedTask;
+        }
+
+        public static Task DoNothing(IServiceProvider serviceProvider)
+        {
+            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogInformation($"Action {nameof(DoNothing)}");
+            return Task.CompletedTask;
+        }
+
+        public static Task RegisterCurrentPage(Dictionary<string, string> stateData, IServiceProvider serviceProvider)
+        {
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            var pageUrl = navigationManager.ToBaseRelativePath(navigationManager.Uri);
+
+            serviceProvider.GetRequiredService<ILogger<OidcSettings>>().LogDebug($"Registering the current page redirect url: {pageUrl}");
+
+            stateData["redirectPage"] = pageUrl;
             return Task.CompletedTask;
         }
     }

@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var navigationManager = b.GetRequiredService<NavigationManager>();
                 var settings = new OidcSettings(issuer);
-                settings.UseDefaultActions(b.GetRequiredService<IServiceProvider>());
+                settings.UseDefaultActions();
                 configure?.Invoke(settings, new Uri(navigationManager.BaseUri));
                 new OidcSettingsValidator().EnsureValidSettings(services, settings);
                 return settings;
