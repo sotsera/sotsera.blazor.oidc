@@ -155,7 +155,7 @@ namespace Sotsera.Blazor.Oidc
             return settings;
         }
 
-        public static OidcSettings UseRedirectToCallerActionsForAuthenticationRedirect(this OidcSettings settings)
+        public static OidcSettings UseRedirectToCallerAfterAuthenticationRedirect(this OidcSettings settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
@@ -164,7 +164,7 @@ namespace Sotsera.Blazor.Oidc
             return settings;
         }
 
-        public static OidcSettings UseRedirectToCallerActionsForLogoutRedirect(this OidcSettings settings)
+        public static OidcSettings UseRedirectToCallerAfterLogoutRedirect(this OidcSettings settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 

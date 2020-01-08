@@ -15,8 +15,8 @@ namespace ClientSide
             services.AddOidc(new Uri("https://demo.identityserver.io"), (settings, siteUri) =>
             {
                 settings.UseDefaultCallbackUris(siteUri);
-                settings.UseRedirectToCallerActionsForAuthenticationRedirect();
-                settings.UseRedirectToCallerActionsForLogoutRedirect();
+                settings.UseRedirectToCallerAfterAuthenticationRedirect();
+                settings.UseRedirectToCallerAfterLogoutRedirect();
                 settings.UseDemoFlow().Code(); // Just for this demo: allows to quickly change to one of the supported flows
                 settings.Scope = "openid profile email api";
 
