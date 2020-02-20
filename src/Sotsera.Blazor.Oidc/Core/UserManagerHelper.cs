@@ -21,6 +21,7 @@ namespace Sotsera.Blazor.Oidc.Core
         Task<UserState> UserState();
         Task ClearUserState();
         Task SetUserState(UserState userState);
+        void SetHttpClientToken(UserState userState);
         Task StartFlow(OidcRequest request);
     }
 
@@ -74,6 +75,10 @@ namespace Sotsera.Blazor.Oidc.Core
         public async Task SetUserState(UserState userState)
         {
             await Store.SetUserState(userState);
+        }
+
+        public void SetHttpClientToken(UserState userState)
+        {
             HttpClient.SetToken(userState.AccessToken);
         }
 

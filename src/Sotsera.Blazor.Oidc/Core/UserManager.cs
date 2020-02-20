@@ -203,6 +203,7 @@ namespace Sotsera.Blazor.Oidc.Core
                 SessionIsValid = true;
                 if(Settings.MonitorSession) await Monitor.Start(UserState);
                 if (updateStore) await Helper.SetUserState(userState);
+                Helper.SetHttpClientToken(userState);
             }
 
             if (raiseEvent) UserChanged?.Invoke(userState?.User);
