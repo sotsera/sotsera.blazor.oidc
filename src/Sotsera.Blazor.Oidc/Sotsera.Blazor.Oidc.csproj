@@ -8,7 +8,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>Sotsera.Blazor.Oidc</AssemblyName>
     <RootNamespace>Sotsera.Blazor.Oidc</RootNamespace>
-    <Version>1.0.0-alpha-7</Version>
+    <Version>1.0.0-alpha-8</Version>
     <Description>OpenID Connect (OIDC) client for Blazor client-side or hosted projects</Description>
     <PackageProjectUrl>https://github.com/sotsera/sotsera.blazor.oidc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/sotsera/sotsera.blazor.oidc.git</RepositoryUrl>

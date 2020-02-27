@@ -26,7 +26,11 @@ namespace Sotsera.Blazor.Oidc.Core
         private IOidcClient OidcClient { get; }
         private ILogoutClient LogoutClient { get; }
         private ISessionMonitor Monitor { get; }
-        private IUserManagerHelper Helper { get; }
+        //private IUserManagerHelper Helper { get; }
+
+        private IUserManagerHelper _helper;
+        // workaround suggested in dotnet/aspnetcore#11867 for prerendering 
+        private IUserManagerHelper Helper => _helper ??= ServiceProvider.GetRequiredService<IUserManagerHelper>();
 
         public OidcUser User => UserState?.User;
         public UserState UserState { get; private set; }
@@ -42,7 +46,7 @@ namespace Sotsera.Blazor.Oidc.Core
             OidcClient = serviceProvider.GetRequiredService<IOidcClient>();
             LogoutClient = serviceProvider.GetRequiredService<ILogoutClient>();
             Monitor = serviceProvider.GetRequiredService<ISessionMonitor>();
-            Helper = serviceProvider.GetRequiredService<IUserManagerHelper>();
+            //Helper = serviceProvider.GetRequiredService<IUserManagerHelper>();
             Logger = serviceProvider.GetRequiredService<IOidcLogger<UserManager>>();
 
             Version = GetType().InformationalVersion();
