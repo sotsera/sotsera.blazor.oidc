@@ -1,0 +1,22 @@
+﻿<!--
+Copyright (c) Alessandro Ghidini. All rights reserved.
+Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Sotsera.Blazor.Oidc Popup Logout Callback</title>
+</head>
+<body>
+    <div id="errorContainer" style="display: none;">
+        <h3>Sotsera.Blazor.Oidc Popup Logout Callback</h3>
+        <pre id="error"></pre>
+    </div>
+    <script>
+        Promise.resolve()
+            .then(() => window.opener.sotsera.blazor.oidc.logoutCallback())
+            .catch(function (e) { document.getElementById("error").innerHTML = e; document.getElementById("errorContainer").style.display = "block"; });
+    </script>
+</body>
+</html>
